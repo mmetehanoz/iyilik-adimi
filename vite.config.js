@@ -5,6 +5,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   // Github Pages (project pages) icin alt dizin:
   // Repo adi: iyilik-adimi → /iyilik-adimi/
-  base: './',
+  base: '/iyilik-adimi/',
   plugins: [react()],
 })
