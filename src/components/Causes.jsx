@@ -1,3 +1,5 @@
+import waterWellImg from '../assets/water-well.jpg';
+
 const causes = [
     {
         id: 1,
@@ -7,7 +9,7 @@ const causes = [
         goal: 320000,
         raised: 38989,
         percentage: 12,
-        image: "https://images.unsplash.com/photo-1594372365401-4115d7f8d68d?w=800&q=80",
+        image: waterWellImg,
         color: "teal",
     },
     {
