@@ -8,16 +8,16 @@ export default function Header() {
           <img src={logo} alt="Iyilik Adımı Logo" className="h-16 w-auto" />
         </div>
         <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-white/90">
-          <a href="#" className="hover:text-white">ANASAYFA</a>
-          <a href="#causes" className="hover:text-white">PROJELERİMİZ</a>
-          <a href="#give" className="hover:text-white">BAĞIŞ</a>
-          <a href="#about" className="hover:text-white">HAKKIMIZDA</a>
-          <a href="#pages" className="hover:text-white">SAYFALAR</a>
-          <a href="#shop" className="hover:text-white">MAĞAZA</a>
-          <a href="#blog" className="hover:text-white">BLOG</a>
-          <a href="#contact" className="hover:text-white">İLETİŞİM</a>
+          <a href="#" className="hover:text-[#12985a] transition-colors">ANASAYFA</a>
+          <a href="#causes" className="hover:text-[#12985a] transition-colors">PROJELERİMİZ</a>
+          <a href="#give" className="hover:text-[#12985a] transition-colors">BAĞIŞ</a>
+          <a href="#about" className="hover:text-[#12985a] transition-colors">HAKKIMIZDA</a>
+          <a href="#pages" className="hover:text-[#12985a] transition-colors">SAYFALAR</a>
+          <a href="#shop" className="hover:text-[#12985a] transition-colors">MAĞAZA</a>
+          <a href="#blog" className="hover:text-[#12985a] transition-colors">BLOG</a>
+          <a href="#contact" className="hover:text-[#12985a] transition-colors">İLETİŞİM</a>
         </nav>
-        <button className="inline-flex items-center rounded-full bg-emerald-500 px-4 py-2 text-white hover:bg-emerald-600">
+        <button className="inline-flex items-center rounded-full bg-[#103e6a] px-4 py-2 text-white hover:opacity-90">
           BAĞIŞ YAP
         </button>
       </div>

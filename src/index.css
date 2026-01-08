@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+@keyframes heartbeat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(16, 62, 106, 0.7);
+    }
+}
+
+.animate-heartbeat {
+    animation: heartbeat 2s infinite ease-in-out;
+}

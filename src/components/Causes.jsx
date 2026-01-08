@@ -36,22 +36,22 @@ const causes = [
 
 const colorClasses = {
     teal: {
-        bg: "bg-teal-500",
-        text: "text-teal-500",
-        bar: "bg-teal-500",
-        btn: "bg-teal-500 hover:bg-teal-600",
+        bg: "bg-[#12985a]",
+        text: "text-[#12985a]",
+        bar: "bg-[#12985a]",
+        btn: "bg-[#12985a] hover:opacity-90",
     },
     yellow: {
-        bg: "bg-amber-400",
-        text: "text-amber-400",
-        bar: "bg-amber-400",
-        btn: "bg-amber-400 hover:bg-amber-500",
+        bg: "bg-[#12985a]",
+        text: "text-[#12985a]",
+        bar: "bg-[#12985a]",
+        btn: "bg-[#12985a] hover:opacity-90",
     },
     red: {
-        bg: "bg-red-500",
-        text: "text-red-500",
-        bar: "bg-red-500",
-        btn: "bg-red-500 hover:bg-red-600",
+        bg: "bg-[#12985a]",
+        text: "text-[#12985a]",
+        bar: "bg-[#12985a]",
+        btn: "bg-[#12985a] hover:opacity-90",
     },
 };
 
@@ -61,11 +61,11 @@ export default function Causes() {
             {/* Header Section */}
             <div className="mb-16 grid gap-8 lg:grid-cols-2 lg:items-center">
                 <div>
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-[#12985a]">
                         PROJELERİMİZ
                     </h3>
                     <h2 className="mt-2 text-6xl font-black text-gray-700">
-                        YARDIM <span className="text-gray-700">ET!</span>
+                        YARDIM <span className="text-[#12985a]">ET!</span>
                     </h2>
                 </div>
 
@@ -73,7 +73,7 @@ export default function Causes() {
                     <p className="text-gray-500 lg:max-w-md">
                         İyilik paylaştıkça çoğalır. Siz de projelerimize destek olarak ihtiyaç sahiplerinin yüzündeki tebessümün sebebi olabilirsiniz.
                     </p>
-                    <button className="whitespace-nowrap rounded-full bg-amber-400 px-8 py-3 text-sm font-bold text-white transition-colors hover:bg-amber-500">
+                    <button className="whitespace-nowrap rounded-full bg-[#103e6a] px-8 py-3 text-sm font-bold text-white transition-colors hover:opacity-90">
                         TÜMÜNÜ GÖR
                     </button>
                 </div>
@@ -138,7 +138,7 @@ export default function Causes() {
                                 </div>
 
                                 {/* View Details Button */}
-                                <button className={`mt-8 rounded-full ${theme.btn} px-6 py-2.5 text-xs font-bold text-white transition-colors`}>
+                                <button className={`mt-8 rounded-full bg-[#103e6a] px-6 py-2.5 text-xs font-bold text-white transition-colors hover:opacity-90`}>
                                     DETAYLARI GÖR
                                 </button>
                             </div>
