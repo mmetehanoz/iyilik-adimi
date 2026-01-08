@@ -5,13 +5,13 @@ export default function Footer() {
                 <p className="text-sm text-gray-600">© {new Date().getFullYear()} Iyilik Adımı</p>
                 <div className="flex gap-4 text-sm">
                     <a href="#" className="hover:text-teal-600">
-                        Privacy
+                        Gizlilik
                     </a>
                     <a href="#" className="hover:text-teal-600">
-                        Terms
+                        Şartlar
                     </a>
                     <a href="#" className="hover:text-teal-600">
-                        Contact
+                        İletişim
                     </a>
                 </div>
             </div>

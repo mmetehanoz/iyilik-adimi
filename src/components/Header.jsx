@@ -8,17 +8,17 @@ export default function Header() {
           <img src={logo} alt="Iyilik Adımı Logo" className="h-16 w-auto" />
         </div>
         <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-white/90">
-          <a href="#" className="hover:text-white">HOME</a>
-          <a href="#causes" className="hover:text-white">CAUSES</a>
-          <a href="#give" className="hover:text-white">GIVE</a>
-          <a href="#about" className="hover:text-white">ABOUT US</a>
-          <a href="#pages" className="hover:text-white">PAGES</a>
-          <a href="#shop" className="hover:text-white">SHOP</a>
+          <a href="#" className="hover:text-white">ANASAYFA</a>
+          <a href="#causes" className="hover:text-white">PROJELERİMİZ</a>
+          <a href="#give" className="hover:text-white">BAĞIŞ</a>
+          <a href="#about" className="hover:text-white">HAKKIMIZDA</a>
+          <a href="#pages" className="hover:text-white">SAYFALAR</a>
+          <a href="#shop" className="hover:text-white">MAĞAZA</a>
           <a href="#blog" className="hover:text-white">BLOG</a>
-          <a href="#contact" className="hover:text-white">CONTACT</a>
+          <a href="#contact" className="hover:text-white">İLETİŞİM</a>
         </nav>
         <button className="inline-flex items-center rounded-full bg-emerald-500 px-4 py-2 text-white hover:bg-emerald-600">
-          DONATE NOW
+          BAĞIŞ YAP
         </button>
       </div>
     </header>
