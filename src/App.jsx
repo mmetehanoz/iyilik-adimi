@@ -1,6 +1,7 @@
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Causes from './components/Causes';
+import Services from './components/Services';
 import Footer from './components/Footer';
 
 export default function App() {
@@ -9,6 +10,7 @@ export default function App() {
       <Header />
       <Hero />
       <Causes />
+      <Services />
       <Footer />
     </div>
   );
