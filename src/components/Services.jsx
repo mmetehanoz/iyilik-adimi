@@ -7,7 +7,7 @@ import testimonyImg from '../assets/testimony.jpg';
 
 export default function Services() {
     return (
-        <section id="pages">
+        <section id="bagis-rehberi">
             {/* Header Banner */}
             <div
                 className="relative flex items-center justify-center py-32 text-center text-white"

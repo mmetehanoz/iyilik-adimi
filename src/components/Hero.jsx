@@ -2,7 +2,7 @@ import ContactBar from './ContactBar';
 
 export default function Hero() {
     return (
-        <section className="relative min-h-[80vh] w-full flex items-center justify-center">
+        <section id="anasayfa" className="relative min-h-[80vh] w-full flex items-center justify-center">
             <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{

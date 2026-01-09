@@ -8,12 +8,12 @@ export default function Header() {
           <img src={logo} alt="Iyilik Adımı Logo" className="h-16 w-auto" />
         </div>
         <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-white/90">
-          <a href="#" className="hover:text-[#12985a] transition-colors">ANASAYFA</a>
-          <a href="#about" className="hover:text-[#12985a] transition-colors">HAKKIMIZDA</a>
-          <a href="#causes" className="hover:text-[#12985a] transition-colors">PROJELERİMİZ</a>
-          <a href="#media" className="hover:text-[#12985a] transition-colors">MEDYA</a>
-          <a href="#guide" className="hover:text-[#12985a] transition-colors">BAĞIŞ REHBERİ</a>
-          <a href="#contact" className="hover:text-[#12985a] transition-colors">İLETİŞİM</a>
+          <a href="#anasayfa" className="hover:text-[#12985a] transition-colors">ANASAYFA</a>
+          <a href="#hakkimizda" className="hover:text-[#12985a] transition-colors">HAKKIMIZDA</a>
+          <a href="#projelerimiz" className="hover:text-[#12985a] transition-colors">PROJELERİMİZ</a>
+          <a href="#medya" className="hover:text-[#12985a] transition-colors">MEDYA</a>
+          <a href="#bagis-rehberi" className="hover:text-[#12985a] transition-colors">BAĞIŞ REHBERİ</a>
+          <a href="#iletisim" className="hover:text-[#12985a] transition-colors">İLETİŞİM</a>
         </nav>
         <button className="inline-flex items-center rounded-full bg-[#103e6a] px-4 py-2 text-white hover:opacity-90">
           BAĞIŞ YAP

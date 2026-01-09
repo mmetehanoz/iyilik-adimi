@@ -99,7 +99,7 @@ const colorClasses = {
 
 export default function Causes() {
     return (
-        <section id="causes" className="mx-auto max-w-7xl px-4 py-24">
+        <section id="projelerimiz" className="mx-auto max-w-7xl px-4 py-24">
             {/* Header Section */}
             <div className="mb-16 grid gap-8 lg:grid-cols-2 lg:items-center">
                 <div>
