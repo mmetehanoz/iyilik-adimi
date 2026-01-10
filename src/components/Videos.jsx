@@ -47,6 +47,35 @@ export default function Videos() {
                         </div>
                     ))}
                 </div>
+
+                {/* Youtube Subscribe Bar */}
+                <div className="mx-auto mt-12 max-w-4xl relative overflow-hidden rounded-2xl p-[3px]">
+                    {/* Animated Border Background */}
+                    <div className="absolute inset-[-500%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2E8F0_0%,#12985a_50%,#E2E8F0_100%)]" />
+
+                    {/* Content Container */}
+                    <div className="relative flex flex-col items-center justify-between gap-6 rounded-2xl bg-[#CC0000] p-8 text-white shadow-xl md:flex-row md:px-12 h-full w-full">
+                        <div className="flex items-center gap-6">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-[#CC0000] shadow-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-8 w-8">
+                                    <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
+                                </svg>
+                            </div>
+                            <div className="text-center md:text-left">
+                                <h4 className="text-2xl font-black">KANALIMIZA ABONE OLUN!</h4>
+                                <p className="mt-1 text-white/90">Faaliyetlerimizi ve yardım çalışmalarımızı yakından takip edin.</p>
+                            </div>
+                        </div>
+                        <a
+                            href="https://www.youtube.com/@iyilikadimitr"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="whitespace-nowrap rounded-full bg-white px-8 py-3 text-sm font-bold text-[#CC0000] transition-transform animate-heartbeat hover:scale-105 hover:bg-gray-100 active:scale-95"
+                        >
+                            ABONE OL
+                        </a>
+                    </div>
+                </div>
             </div>
         </section>
     );
