@@ -1,21 +1,20 @@
+import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
-import Hero from './components/Hero';
-import Causes from './components/Causes';
-import Services from './components/Services';
-import Instagram from './components/Instagram';
-import Videos from './components/Videos';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
+import CartDrawer from './components/CartDrawer';
+import Home from './pages/Home';
+import Donations from './pages/Donations';
 
 export default function App() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <Header />
-      <Hero />
-      <Causes />
-      <Videos />
-      <Instagram />
-      <Services />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/bagislar" element={<Donations />} />
+      </Routes>
+      <CartDrawer />
       <Footer />
       <WhatsAppButton />
     </div>
