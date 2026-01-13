@@ -12,6 +12,7 @@ import Home from './pages/Home';
 import Donations from './pages/Donations';
 import About from './pages/About';
 import ZekatGuide from './pages/ZekatGuide';
+import SadakaGuide from './pages/SadakaGuide';
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="/bagislar" element={<Donations />} />
           <Route path="/hakkimizda" element={<About />} />
           <Route path="/rehber/zekat-nedir" element={<ZekatGuide />} />
+          <Route path="/rehber/sadaka-nedir" element={<SadakaGuide />} />
 
         </Routes>
       </main>

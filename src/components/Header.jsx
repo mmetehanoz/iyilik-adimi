@@ -29,6 +29,7 @@ export default function Header() {
               </button>
               <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top border border-gray-100">
                 <Link to="/rehber/zekat-nedir" className="block px-4 py-2 text-gray-700 hover:bg-[#12985a]/10 hover:text-[#12985a] transition-colors">Zekat Nedir?</Link>
+                <Link to="/rehber/sadaka-nedir" className="block px-4 py-2 text-gray-700 hover:bg-[#12985a]/10 hover:text-[#12985a] transition-colors">Sadaka Nedir?</Link>
               </div>
             </div>
 
