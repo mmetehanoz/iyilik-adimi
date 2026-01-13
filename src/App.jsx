@@ -11,7 +11,8 @@ import WhatsAppButton from './components/WhatsAppButton';
 import Home from './pages/Home';
 import Donations from './pages/Donations';
 import About from './pages/About';
-import DonationGuide from './pages/DonationGuide';
+import ZekatGuide from './pages/ZekatGuide';
+
 
 function App() {
   return (
@@ -24,7 +25,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/bagislar" element={<Donations />} />
           <Route path="/hakkimizda" element={<About />} />
-          <Route path="/rehber/:type" element={<DonationGuide />} />
+          <Route path="/rehber/zekat-nedir" element={<ZekatGuide />} />
+
         </Routes>
       </main>
 
