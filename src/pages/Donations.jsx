@@ -22,7 +22,7 @@ const donationCategories = [
     {
         id: 'kurban',
         title: 'KURBAN',
-        icon: '�',
+        icon: '🐑',
         items: [
             {
                 id: 'inek',
