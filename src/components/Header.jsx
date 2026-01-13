@@ -33,7 +33,7 @@ export default function Header() {
               </div>
             </div>
 
-            <a href="#iletisim" className="hover:text-[#12985a] transition-colors">İLETİŞİM</a>
+            <Link to="/iletisim" className="hover:text-[#12985a] transition-colors">İLETİŞİM</Link>
           </nav>
           <div className="flex items-center gap-3">
             <button
