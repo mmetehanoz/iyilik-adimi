@@ -19,7 +19,7 @@ export default function Header() {
           </div>
           <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-white/90">
             <Link to="/" className="hover:text-[#12985a] transition-colors">ANASAYFA</Link>
-            <a href="#hakkimizda" className="hover:text-[#12985a] transition-colors">HAKKIMIZDA</a>
+            <Link to="/hakkimizda" className="hover:text-[#12985a] transition-colors">HAKKIMIZDA</Link>
             <a href="#projelerimiz" className="hover:text-[#12985a] transition-colors">PROJELERİMİZ</a>
             <a href="#medya" className="hover:text-[#12985a] transition-colors">MEDYA</a>
             <a href="#bagis-rehberi" className="hover:text-[#12985a] transition-colors">BAĞIŞ REHBERİ</a>
