@@ -2,7 +2,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, EffectFade } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
-import ContactBar from './ContactBar';
+import QuickDonation from './QuickDonation';
 
 const slides = [
     {
@@ -77,7 +77,7 @@ export default function Hero() {
                 </button>
             </div>
 
-            <ContactBar />
+            <QuickDonation />
         </section>
     );
 }
