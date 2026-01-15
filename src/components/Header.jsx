@@ -53,15 +53,30 @@ export default function Header() {
 
             <button
               onClick={() => setIsIbanModalOpen(true)}
-              className="hidden sm:inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-bold text-[#103e6a] hover:bg-gray-100 transition-colors"
+              className="hidden sm:inline-flex items-center justify-center rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#103e6a] hover:bg-gray-100 transition-colors btn-animate-loop w-32 relative"
             >
-              KOLAY IBAN
+              <span className="btn-icon absolute left-2.5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+                </svg>
+              </span>
+              <span className="btn-text pl-5">KOLAY IBAN</span>
             </button>
-            <Link to="/uyelik" className="hidden lg:inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-sm font-bold text-white hover:bg-white/20 transition-colors mr-2">
-              ÜYE GİRİŞİ
+            <Link to="/uyelik" className="hidden lg:inline-flex items-center justify-center rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-white hover:bg-white/20 transition-colors mr-2 btn-animate-loop w-32 relative">
+              <span className="btn-icon absolute left-2.5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+              </span>
+              <span className="btn-text pl-5">ÜYE GİRİŞİ</span>
             </Link>
-            <Link to="/bagislar" className="inline-flex items-center rounded-full bg-[#103e6a] px-4 py-2 text-sm font-bold text-white hover:opacity-90">
-              BAĞIŞ YAP
+            <Link to="/bagislar" className="inline-flex items-center justify-center rounded-full bg-[#103e6a] px-3 py-1.5 text-xs font-bold text-white hover:opacity-90 btn-animate-loop w-32 relative">
+              <span className="btn-icon absolute left-2.5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                </svg>
+              </span>
+              <span className="btn-text pl-5">BAĞIŞ YAP</span>
             </Link>
           </div>
         </div>
