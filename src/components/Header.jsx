@@ -57,6 +57,9 @@ export default function Header() {
             >
               KOLAY IBAN
             </button>
+            <Link to="/uyelik" className="hidden lg:inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-sm font-bold text-white hover:bg-white/20 transition-colors mr-2">
+              ÜYE GİRİŞİ
+            </Link>
             <Link to="/bagislar" className="inline-flex items-center rounded-full bg-[#103e6a] px-4 py-2 text-sm font-bold text-white hover:opacity-90">
               BAĞIŞ YAP
             </Link>

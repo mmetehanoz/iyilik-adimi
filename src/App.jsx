@@ -14,6 +14,7 @@ import About from './pages/About';
 import ZekatGuide from './pages/ZekatGuide';
 import SadakaGuide from './pages/SadakaGuide';
 import Contact from './pages/Contact';
+import Auth from './pages/Auth';
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
           <Route path="/rehber/zekat-nedir" element={<ZekatGuide />} />
           <Route path="/rehber/sadaka-nedir" element={<SadakaGuide />} />
           <Route path="/iletisim" element={<Contact />} />
+          <Route path="/uyelik" element={<Auth />} />
 
         </Routes>
       </main>
