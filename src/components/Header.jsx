@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 
 export default function Header() {
   const [isIbanModalOpen, setIsIbanModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { cartCount, toggleCart } = useCart();
 
   return (
@@ -79,8 +80,69 @@ export default function Header() {
               <span className="btn-text pl-5">BAĞIŞ YAP</span>
             </Link>
           </div>
+          <button
+            className="lg:hidden p-2 text-white hover:text-[#12985a] transition-colors"
+            onClick={() => setIsMobileMenuOpen(true)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
         </div>
       </header>
+
+      {/* Mobile Menu Overlay */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/95 backdrop-blur-xl transition-transform duration-300 lg:hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+      >
+        <div className="flex flex-col h-full p-6">
+          <div className="flex justify-end mb-8">
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 text-white hover:text-[#12985a] transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <nav className="flex flex-col gap-6 text-xl font-medium text-white text-center">
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#12985a]">ANASAYFA</Link>
+            <Link to="/hakkimizda" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#12985a]">HAKKIMIZDA</Link>
+            <a href="#projelerimiz" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#12985a]">PROJELERİMİZ</a>
+            <a href="#medya" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#12985a]">MEDYA</a>
+
+            <div className="py-2 border-y border-white/10 flex flex-col gap-4">
+              <Link to="/rehber/zekat-nedir" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-300 hover:text-[#12985a] text-lg">Zekat Nedir?</Link>
+              <Link to="/rehber/sadaka-nedir" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-300 hover:text-[#12985a] text-lg">Sadaka Nedir?</Link>
+            </div>
+
+            <Link to="/iletisim" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#12985a]">İLETİŞİM</Link>
+
+            <div className="mt-4 flex flex-col gap-4">
+              <button
+                onClick={() => {
+                  setIsIbanModalOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full rounded-full bg-white py-3 text-[#103e6a] font-bold"
+              >
+                KOLAY IBAN
+              </button>
+
+              <Link
+                to="/uyelik"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full rounded-full bg-white/10 py-3 text-white font-bold"
+              >
+                ÜYE GİRİŞİ
+              </Link>
+            </div>
+          </nav>
+        </div>
+      </div>
 
       <IbanModal
         isOpen={isIbanModalOpen}
