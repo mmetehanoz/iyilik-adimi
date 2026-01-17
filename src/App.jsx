@@ -1,9 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
+import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 import Header from './components/Header';
-import Hero from './components/Hero';
-import Causes from './components/Causes';
-import Videos from './components/Videos';
-import Instagram from './components/Instagram';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -15,30 +13,34 @@ import ZekatGuide from './pages/ZekatGuide';
 import SadakaGuide from './pages/SadakaGuide';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
-
+import Dashboard from './pages/Dashboard';
 
 function App() {
   return (
-    <div className="font-sans antialiased text-gray-800">
-      <Header />
-      <CartDrawer />
+    <AuthProvider>
+      <CartProvider>
+        <div className="font-sans antialiased text-gray-800">
+          <Header />
+          <CartDrawer />
 
-      <main>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/bagislar" element={<Donations />} />
-          <Route path="/hakkimizda" element={<About />} />
-          <Route path="/rehber/zekat-nedir" element={<ZekatGuide />} />
-          <Route path="/rehber/sadaka-nedir" element={<SadakaGuide />} />
-          <Route path="/iletisim" element={<Contact />} />
-          <Route path="/uyelik" element={<Auth />} />
+          <main>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/bagislar" element={<Donations />} />
+              <Route path="/hakkimizda" element={<About />} />
+              <Route path="/rehber/zekat-nedir" element={<ZekatGuide />} />
+              <Route path="/rehber/sadaka-nedir" element={<SadakaGuide />} />
+              <Route path="/iletisim" element={<Contact />} />
+              <Route path="/uyelik" element={<Auth />} />
+              <Route path="/hesabim" element={<Dashboard />} />
+            </Routes>
+          </main>
 
-        </Routes>
-      </main>
-
-      <Footer />
-      <WhatsAppButton />
-    </div>
+          <Footer />
+          <WhatsAppButton />
+        </div>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 

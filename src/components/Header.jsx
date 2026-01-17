@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
 import IbanModal from './IbanModal';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Header() {
   const [isIbanModalOpen, setIsIbanModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { cartCount, toggleCart } = useCart();
+  const { isAuthenticated } = useAuth();
 
   return (
     <>
@@ -63,14 +65,25 @@ export default function Header() {
               </span>
               <span className="btn-text pl-5">KOLAY IBAN</span>
             </button>
-            <Link to="/uyelik" className="hidden lg:inline-flex items-center justify-center rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-white hover:bg-white/20 transition-colors mr-2 btn-animate-loop w-32 relative">
-              <span className="btn-icon absolute left-2.5">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                </svg>
-              </span>
-              <span className="btn-text pl-5">ÜYE GİRİŞİ</span>
-            </Link>
+            {isAuthenticated ? (
+              <Link to="/hesabim" className="hidden lg:inline-flex items-center justify-center rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-white hover:bg-white/20 transition-colors mr-2 btn-animate-loop w-32 relative">
+                <span className="btn-icon absolute left-2.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                  </svg>
+                </span>
+                <span className="btn-text pl-5">HESABIM</span>
+              </Link>
+            ) : (
+              <Link to="/uyelik" className="hidden lg:inline-flex items-center justify-center rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-white hover:bg-white/20 transition-colors mr-2 btn-animate-loop w-32 relative">
+                <span className="btn-icon absolute left-2.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                  </svg>
+                </span>
+                <span className="btn-text pl-5">ÜYE GİRİŞİ</span>
+              </Link>
+            )}
             <Link to="/bagislar" className="inline-flex items-center justify-center rounded-full bg-[#103e6a] px-3 py-1.5 text-xs font-bold text-white hover:opacity-90 btn-animate-loop w-32 relative">
               <span className="btn-icon absolute left-2.5">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
@@ -132,13 +145,23 @@ export default function Header() {
                 KOLAY IBAN
               </button>
 
-              <Link
-                to="/uyelik"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full rounded-full bg-white/10 py-3 text-white font-bold"
-              >
-                ÜYE GİRİŞİ
-              </Link>
+              {isAuthenticated ? (
+                <Link
+                  to="/hesabim"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full rounded-full bg-white/10 py-3 text-white font-bold"
+                >
+                  HESABIM
+                </Link>
+              ) : (
+                <Link
+                  to="/uyelik"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full rounded-full bg-white/10 py-3 text-white font-bold"
+                >
+                  ÜYE GİRİŞİ
+                </Link>
+              )}
             </div>
           </nav>
         </div>
