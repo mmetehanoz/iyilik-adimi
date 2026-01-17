@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function ZekatGuide() {
     useEffect(() => {
@@ -95,9 +96,9 @@ export default function ZekatGuide() {
                         <p className="mb-6 text-white/90">
                             İyilik Adımı Derneği olarak zekatlarınızı gerçek ihtiyaç sahiplerine güvenle ulaştırıyoruz.
                         </p>
-                        <a href="/bagislar" className="inline-block bg-white text-[#12985a] px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-lg">
+                        <Link to="/bagislar" className="inline-block bg-white text-[#12985a] px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-lg">
                             Zekat Bağışı Yap
-                        </a>
+                        </Link>
                     </div>
 
                 </div>

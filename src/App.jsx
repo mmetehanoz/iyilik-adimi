@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import CartDrawer from './components/CartDrawer';
 import WhatsAppButton from './components/WhatsAppButton';
+import ScrollToTop from './components/ScrollToTop';
 // Pages
 import Home from './pages/Home';
 import Donations from './pages/Donations';
@@ -14,12 +15,14 @@ import SadakaGuide from './pages/SadakaGuide';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
+import Payment from './pages/Payment';
 
 function App() {
   return (
     <AuthProvider>
       <CartProvider>
         <div className="font-sans antialiased text-gray-800">
+          <ScrollToTop />
           <Header />
           <CartDrawer />
 
@@ -33,6 +36,7 @@ function App() {
               <Route path="/iletisim" element={<Contact />} />
               <Route path="/uyelik" element={<Auth />} />
               <Route path="/hesabim" element={<Dashboard />} />
+              <Route path="/odeme" element={<Payment />} />
             </Routes>
           </main>
 

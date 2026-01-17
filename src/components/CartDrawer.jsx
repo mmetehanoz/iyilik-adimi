@@ -132,9 +132,13 @@ export default function CartDrawer() {
                                     {new Intl.NumberFormat('tr-TR').format(cartTotal)} ₺
                                 </span>
                             </div>
-                            <button className="w-full py-4 bg-[#103e6a] text-white rounded-xl font-bold hover:bg-[#0d3257] active:scale-[0.98] transition-all shadow-lg shadow-[#103e6a]/20">
+                            <Link
+                                to="/odeme"
+                                onClick={() => setIsCartOpen(false)}
+                                className="block w-full py-4 bg-[#103e6a] text-white rounded-xl font-bold hover:bg-[#0d3257] active:scale-[0.98] transition-all shadow-lg shadow-[#103e6a]/20 text-center"
+                            >
                                 ÖDEME YAP
-                            </button>
+                            </Link>
                             <p className="text-xs text-center text-gray-500 mt-3">
                                 Güvenli ödeme altyapısı ile korunmaktadır.
                             </p>

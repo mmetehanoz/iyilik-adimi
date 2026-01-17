@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function SadakaGuide() {
     useEffect(() => {
@@ -100,9 +101,9 @@ export default function SadakaGuide() {
                         <p className="mb-6 text-white/90">
                             Küçük bir yardım bile bir başkasının hayatında büyük bir umut olabilir.
                         </p>
-                        <a href="/bagislar" className="inline-block bg-white text-[#12985a] px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-lg">
+                        <Link to="/bagislar" className="inline-block bg-white text-[#12985a] px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-lg">
                             Sadaka Bağışı Yap
-                        </a>
+                        </Link>
                     </div>
 
                 </div>
