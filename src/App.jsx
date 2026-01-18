@@ -16,6 +16,7 @@ import Contact from './pages/Contact';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import Payment from './pages/Payment';
+import ZekatCalculator from './pages/ZekatCalculator';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
               <Route path="/uyelik" element={<Auth />} />
               <Route path="/hesabim" element={<Dashboard />} />
               <Route path="/odeme" element={<Payment />} />
+              <Route path="/zekat-hesaplama" element={<ZekatCalculator />} />
             </Routes>
           </main>
 
