@@ -20,7 +20,7 @@ export default function Header() {
               <img src={logo} alt="Iyilik Adımı Logo" className="h-16 w-auto" />
             </Link>
           </div>
-          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-white/90">
+          <nav className="hidden lg:flex items-center gap-10 ml-12 text-sm font-medium text-white/90">
             <Link to="/" className="hover:text-[#12985a] transition-colors">ANASAYFA</Link>
             <Link to="/hakkimizda" className="hover:text-[#12985a] transition-colors">HAKKIMIZDA</Link>
             <a href="#projelerimiz" className="hover:text-[#12985a] transition-colors">PROJELERİMİZ</a>
