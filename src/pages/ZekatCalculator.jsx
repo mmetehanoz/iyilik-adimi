@@ -532,7 +532,6 @@ export default function ZekatCalculator() {
                                         else label = `${key} (Döviz)`;
 
                                         return (
-                                        return (
                                             <div key={key} className="flex flex-col md:flex-row md:items-center gap-2 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
                                                 <span className="font-semibold text-gray-700 text-sm md:w-1/3 break-words">{label}</span>
                                                 <div className="grid grid-cols-2 gap-2 w-full md:w-2/3">
@@ -562,7 +561,6 @@ export default function ZekatCalculator() {
                                                     </div>
                                                 </div>
                                             </div>
-                                        );
                                         );
                                     })}
                                 </div>
