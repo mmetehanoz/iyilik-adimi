@@ -20,6 +20,10 @@ export default function Header() {
               <img src={logo} alt="Iyilik Adımı Logo" className="h-16 w-auto object-contain" />
             </Link>
           </div>
+
+          {/* Separator */}
+          <div className="hidden lg:block text-white/30 text-3xl font-thin mx-4 pb-2">|</div>
+
           <nav className="hidden lg:flex items-center gap-6 text-sm font-bold text-white/90 whitespace-nowrap">
             <Link to="/" className="hover:text-[#12985a] transition-colors">ANASAYFA</Link>
             <Link to="/hakkimizda" className="hover:text-[#12985a] transition-colors">HAKKIMIZDA</Link>
