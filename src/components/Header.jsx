@@ -24,7 +24,18 @@ export default function Header() {
             <Link to="/" className="hover:text-[#12985a] transition-colors">ANASAYFA</Link>
             <Link to="/hakkimizda" className="hover:text-[#12985a] transition-colors">HAKKIMIZDA</Link>
             <a href="#projelerimiz" className="hover:text-[#12985a] transition-colors">PROJELERİMİZ</a>
-            <a href="#medya" className="hover:text-[#12985a] transition-colors">MEDYA</a>
+
+            <div className="relative group">
+              <button className="hover:text-[#12985a] transition-colors py-4 flex items-center gap-1">
+                MEDYA
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top border border-gray-100">
+                <Link to="/medya/videolar" className="block px-4 py-2 text-gray-700 hover:bg-[#12985a]/10 hover:text-[#12985a] transition-colors">Videolar</Link>
+                {/* Future media items can go here */}
+              </div>
+            </div>
+
             <div className="relative group">
               <button className="hover:text-[#12985a] transition-colors py-4 flex items-center gap-1">
                 BAĞIŞ REHBERİ

@@ -17,6 +17,7 @@ import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import Payment from './pages/Payment';
 import ZekatCalculator from './pages/ZekatCalculator';
+import Videos from './pages/Videos';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
               <Route path="/hesabim" element={<Dashboard />} />
               <Route path="/odeme" element={<Payment />} />
               <Route path="/zekat-hesaplama" element={<ZekatCalculator />} />
+              <Route path="/medya/videolar" element={<Videos />} />
             </Routes>
           </main>
 
