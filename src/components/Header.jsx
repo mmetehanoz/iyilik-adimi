@@ -54,6 +54,10 @@ export default function Header() {
 
             <Link to="/iletisim" className="hover:text-[#12985a] transition-colors">İLETİŞİM</Link>
           </nav>
+
+          {/* Separator */}
+          <div className="hidden lg:block text-white/30 text-3xl font-thin mx-4 pb-2">|</div>
+
           <div className="flex items-center gap-3">
             <button
               onClick={toggleCart}
