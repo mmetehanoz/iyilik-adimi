@@ -137,9 +137,13 @@ export default function Header() {
             <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#12985a]">ANASAYFA</Link>
             <Link to="/hakkimizda" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#12985a]">HAKKIMIZDA</Link>
             <a href="#projelerimiz" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#12985a]">PROJELERİMİZ</a>
-            <a href="#medya" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#12985a]">MEDYA</a>
 
             <div className="py-2 border-y border-white/10 flex flex-col gap-4">
+              <span className="text-white/60 text-sm font-bold uppercase tracking-wider">MEDYA</span>
+              <Link to="/medya/videolar" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-300 hover:text-[#12985a] text-lg">Videolar</Link>
+            </div>
+
+            <div className="py-2 border-b border-white/10 flex flex-col gap-4">
               <Link to="/zekat-hesaplama" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-300 hover:text-[#12985a] text-lg">Zekat Hesaplama</Link>
               <Link to="/rehber/zekat-nedir" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-300 hover:text-[#12985a] text-lg">Zekat Nedir?</Link>
               <Link to="/rehber/sadaka-nedir" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-300 hover:text-[#12985a] text-lg">Sadaka Nedir?</Link>
