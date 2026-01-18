@@ -323,25 +323,43 @@ export default function ZekatCalculator() {
                         {/* 1. Add Item */}
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                             <div className="flex flex-col md:flex-row gap-6">
-                                {/* Categories Sidebar */}
-                                <div className="w-full md:w-1/4 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide shrink-0">
-                                    {CATEGORIES.map(cat => (
-                                        <button
-                                            key={cat.id}
-                                            onClick={() => { setActiveCatId(cat.id); setAmount(''); }}
-                                            className={`px-4 py-3 text-sm font-bold rounded-xl text-left transition-all flex items-center justify-between group whitespace-nowrap md:whitespace-normal ${activeCatId === cat.id
-                                                ? 'bg-[#103e6a] text-white shadow-lg'
-                                                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                                                }`}
+                                {/* Categories Sidebar / Mobile Dropdown */}
+                                <div className="w-full md:w-1/4 shrink-0">
+                                    {/* Mobile: Dropdown */}
+                                    <div className="md:hidden mb-4">
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Varlık Türü Seçiniz</label>
+                                        <select
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 font-bold focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none appearance-none"
+                                            value={activeCatId}
+                                            onChange={(e) => { setActiveCatId(e.target.value); setAmount(''); }}
+                                            style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23103e6a%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto', paddingRight: '2.5em' }}
                                         >
-                                            <span>{cat.label}</span>
-                                            {activeCatId === cat.id && (
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 hidden md:block">
-                                                    <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-                                                </svg>
-                                            )}
-                                        </button>
-                                    ))}
+                                            {CATEGORIES.map(cat => (
+                                                <option key={cat.id} value={cat.id}>{cat.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {/* Desktop: Vertical Buttons */}
+                                    <div className="hidden md:flex flex-col gap-2">
+                                        {CATEGORIES.map(cat => (
+                                            <button
+                                                key={cat.id}
+                                                onClick={() => { setActiveCatId(cat.id); setAmount(''); }}
+                                                className={`px-4 py-3 text-sm font-bold rounded-xl text-left transition-all flex items-center justify-between group ${activeCatId === cat.id
+                                                    ? 'bg-[#103e6a] text-white shadow-lg'
+                                                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                                                    }`}
+                                            >
+                                                <span>{cat.label}</span>
+                                                {activeCatId === cat.id && (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                                                        <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                                                    </svg>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 {/* Form Area */}
@@ -514,14 +532,15 @@ export default function ZekatCalculator() {
                                         else label = `${key} (Döviz)`;
 
                                         return (
+                                        return (
                                             <div key={key} className="flex flex-col md:flex-row md:items-center gap-2 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                                                <span className="font-semibold text-gray-700 text-sm md:w-1/3">{label}</span>
-                                                <div className="flex gap-2 w-full md:w-2/3">
-                                                    <div className="flex-1 relative">
-                                                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold">ALIŞ</span>
+                                                <span className="font-semibold text-gray-700 text-sm md:w-1/3 break-words">{label}</span>
+                                                <div className="grid grid-cols-2 gap-2 w-full md:w-2/3">
+                                                    <div className="relative">
+                                                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold pointer-events-none">ALIŞ</span>
                                                         <input
                                                             type="number"
-                                                            className="w-full pl-10 pr-2 py-2 border rounded-lg text-sm focus:border-[#103e6a] outline-none bg-gray-50/50"
+                                                            className="w-full pl-10 pr-2 py-3 border rounded-lg text-base focus:border-[#103e6a] outline-none bg-gray-50/50"
                                                             value={userRates[key]?.buy || ''}
                                                             onChange={(e) => setUserRates(prev => ({
                                                                 ...prev,
@@ -529,11 +548,11 @@ export default function ZekatCalculator() {
                                                             }))}
                                                         />
                                                     </div>
-                                                    <div className="flex-1 relative">
-                                                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold">SATIŞ</span>
+                                                    <div className="relative">
+                                                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold pointer-events-none">SATIŞ</span>
                                                         <input
                                                             type="number"
-                                                            className="w-full pl-10 pr-2 py-2 border rounded-lg text-sm focus:border-[#103e6a] outline-none bg-gray-50/50"
+                                                            className="w-full pl-10 pr-2 py-3 border rounded-lg text-base focus:border-[#103e6a] outline-none bg-gray-50/50"
                                                             value={userRates[key]?.sell || ''}
                                                             onChange={(e) => setUserRates(prev => ({
                                                                 ...prev,
@@ -543,6 +562,7 @@ export default function ZekatCalculator() {
                                                     </div>
                                                 </div>
                                             </div>
+                                        );
                                         );
                                     })}
                                 </div>
