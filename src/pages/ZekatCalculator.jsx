@@ -240,6 +240,13 @@ export default function ZekatCalculator() {
             isEligible,
             zekatDue: Math.max(0, zekatDue)
         });
+
+        // Auto-scroll to results on mobile
+        if (window.innerWidth < 1024) {
+            setTimeout(() => {
+                document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
     };
 
     // --- EFFECT: Sync needed rates with state ---
@@ -291,17 +298,17 @@ export default function ZekatCalculator() {
     const activeCategory = CATEGORIES.find(c => c.id === activeCatId);
 
     return (
-        <div className="bg-gray-50 min-h-screen pt-32 pb-20">
+        <div className="bg-gray-50 min-h-screen pt-28 pb-12 md:pt-32 md:pb-20">
             <div className="max-w-6xl mx-auto px-4">
 
-                <div className="text-center mb-12">
-                    <span className="inline-block py-1 px-3 rounded-full bg-[#12985a]/10 text-[#12985a] font-bold text-sm mb-4">
+                <div className="text-center mb-8 md:mb-12">
+                    <span className="inline-block py-1 px-3 rounded-full bg-[#12985a]/10 text-[#12985a] font-bold text-xs md:text-sm mb-4">
                         ZEKAT HESAPLAMA ARACI
                     </span>
-                    <h1 className="text-3xl md:text-4xl font-bold text-[#103e6a] mb-4">
+                    <h1 className="text-2xl md:text-4xl font-bold text-[#103e6a] mb-4">
                         Adım Adım Zekat Hesabı
                     </h1>
-                    <p className="text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-gray-600 text-sm md:text-base max-w-2xl mx-auto">
                         1. Varlıklarınızı sepete ekleyin.<br />
                         2. Güncel kur bilgilerini girin.<br />
                         3. Sonucu hesaplayın.
@@ -323,8 +330,8 @@ export default function ZekatCalculator() {
                                             key={cat.id}
                                             onClick={() => { setActiveCatId(cat.id); setAmount(''); }}
                                             className={`px-4 py-3 text-sm font-bold rounded-xl text-left transition-all flex items-center justify-between group whitespace-nowrap md:whitespace-normal ${activeCatId === cat.id
-                                                    ? 'bg-[#103e6a] text-white shadow-lg'
-                                                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                                                ? 'bg-[#103e6a] text-white shadow-lg'
+                                                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
                                                 }`}
                                         >
                                             <span>{cat.label}</span>
@@ -416,7 +423,7 @@ export default function ZekatCalculator() {
                                                     type="text"
                                                     inputMode="decimal"
                                                     placeholder="0,00"
-                                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none"
+                                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none text-base md:text-sm"
                                                     value={amount}
                                                     onChange={(e) => {
                                                         // Remove non-digit and non-comma characters
@@ -551,7 +558,7 @@ export default function ZekatCalculator() {
                     </div>
 
                     {/* RIGHT COLUMN: Results */}
-                    <div className="lg:col-span-1">
+                    <div className="lg:col-span-1" id="results-section">
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-32">
                             <h2 className="text-xl font-bold text-gray-900 mb-6">Sonuç</h2>
 
