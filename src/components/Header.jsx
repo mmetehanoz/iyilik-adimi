@@ -15,12 +15,12 @@ export default function Header() {
     <>
       <header className="fixed top-0 inset-x-0 z-30 bg-black/60 backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between text-white">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <Link to="/">
-              <img src={logo} alt="Iyilik Adımı Logo" className="h-16 w-auto" />
+              <img src={logo} alt="Iyilik Adımı Logo" className="h-16 w-auto object-contain" />
             </Link>
           </div>
-          <nav className="hidden lg:flex items-center gap-10 ml-12 text-sm font-medium text-white/90">
+          <nav className="hidden lg:flex items-center gap-6 text-sm font-bold text-white/90 whitespace-nowrap">
             <Link to="/" className="hover:text-[#12985a] transition-colors">ANASAYFA</Link>
             <Link to="/hakkimizda" className="hover:text-[#12985a] transition-colors">HAKKIMIZDA</Link>
             <a href="#projelerimiz" className="hover:text-[#12985a] transition-colors">PROJELERİMİZ</a>
