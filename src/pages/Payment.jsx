@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import Modal from '../components/Modal';
 
 export default function Payment() {
     const { cartItems, cartTotal, clearCart } = useCart();
@@ -11,15 +12,25 @@ export default function Payment() {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
 
+    // Modal States
+    const [showMembershipModal, setShowMembershipModal] = useState(false);
+    const [showConsentModal, setShowConsentModal] = useState(false);
+
     // Form State
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
+        address: '',
+        city: '',
         cardNumber: '',
         expiry: '',
         cvv: '',
-        cardName: ''
+        cardName: '',
+        isAnonymous: false,
+        isOnBehalf: false,
+        onBehalfOfName: '',
+        agreementsAccepted: false
     });
 
     // Pre-fill user data if logged in
@@ -42,8 +53,11 @@ export default function Payment() {
     }, [cartItems, navigate, success]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
     };
 
     const handleCardNumberChange = (e) => {
@@ -66,6 +80,12 @@ export default function Payment() {
 
     const handlePayment = (e) => {
         e.preventDefault();
+
+        if (!formData.agreementsAccepted) {
+            alert('Lütfen Üyelik Sözleşmesi ve Kişisel Veri Rıza Metnini onaylayın.');
+            return;
+        }
+
         setLoading(true);
 
         // Simulate API call
@@ -152,13 +172,86 @@ export default function Payment() {
                                         required
                                     />
                                 </div>
+                                <div className="space-y-1 md:col-span-2">
+                                    <label className="text-sm font-medium text-gray-700">Adres</label>
+                                    <textarea
+                                        name="address"
+                                        value={formData.address}
+                                        onChange={handleChange}
+                                        rows="2"
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none transition-all resize-none"
+                                        placeholder="Adresiniz"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-1 md:col-span-2">
+                                    <label className="text-sm font-medium text-gray-700">Şehir</label>
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        value={formData.city}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none transition-all"
+                                        placeholder="Örn: İstanbul"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Donation Options */}
+                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                <span className="w-8 h-8 bg-[#103e6a] text-white rounded-full flex items-center justify-center text-sm">2</span>
+                                Bağış Seçenekleri
+                            </h2>
+                            <div className="space-y-4">
+                                <label className="flex items-center gap-3 cursor-pointer group">
+                                    <div className="relative flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            name="isAnonymous"
+                                            checked={formData.isAnonymous}
+                                            onChange={handleChange}
+                                            className="w-5 h-5 rounded border-gray-300 text-[#12985a] focus:ring-[#12985a]"
+                                        />
+                                    </div>
+                                    <span className="text-gray-700 group-hover:text-gray-900 transition-colors">İsimsiz bağış yapmak istiyorum</span>
+                                </label>
+
+                                <label className="flex items-center gap-3 cursor-pointer group">
+                                    <div className="relative flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            name="isOnBehalf"
+                                            checked={formData.isOnBehalf}
+                                            onChange={handleChange}
+                                            className="w-5 h-5 rounded border-gray-300 text-[#12985a] focus:ring-[#12985a]"
+                                        />
+                                    </div>
+                                    <span className="text-gray-700 group-hover:text-gray-900 transition-colors">Başkası adına bağış yapmak istiyorum</span>
+                                </label>
+
+                                {formData.isOnBehalf && (
+                                    <div className="pl-8 animate-fade-in">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Kimin Adına?</label>
+                                        <input
+                                            type="text"
+                                            name="onBehalfOfName"
+                                            value={formData.onBehalfOfName}
+                                            onChange={handleChange}
+                                            className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none transition-all"
+                                            placeholder="Ad Soyad"
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         {/* Payment Form */}
                         <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                             <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                <span className="w-8 h-8 bg-[#103e6a] text-white rounded-full flex items-center justify-center text-sm">2</span>
+                                <span className="w-8 h-8 bg-[#103e6a] text-white rounded-full flex items-center justify-center text-sm">3</span>
                                 Ödeme Bilgileri
                             </h2>
                             <form id="payment-form" onSubmit={handlePayment} className="space-y-4">
@@ -256,6 +349,32 @@ export default function Payment() {
                                 </div>
                             </div>
 
+                            <div className="mb-6 pt-2">
+                                <label className="flex items-start gap-3 cursor-pointer group">
+                                    <div className="relative flex items-center mt-1">
+                                        <input
+                                            type="checkbox"
+                                            name="agreementsAccepted"
+                                            checked={formData.agreementsAccepted}
+                                            onChange={handleChange}
+                                            className="w-5 h-5 rounded border-gray-300 text-[#12985a] focus:ring-[#12985a]"
+                                            required
+                                            form="payment-form"
+                                        />
+                                    </div>
+                                    <span className="text-sm text-gray-600 leading-tight group-hover:text-gray-900 transition-colors">
+                                        <button type="button" onClick={() => setShowMembershipModal(true)} className="font-semibold text-[#12985a] hover:underline">
+                                            Üyelik Sözleşmesi
+                                        </button>
+                                        'ni ve{' '}
+                                        <button type="button" onClick={() => setShowConsentModal(true)} className="font-semibold text-[#12985a] hover:underline">
+                                            Kişisel Veri Rıza Metni
+                                        </button>
+                                        'ni okudum ve kabul ediyorum.
+                                    </span>
+                                </label>
+                            </div>
+
                             <button
                                 type="submit"
                                 form="payment-form"
@@ -279,14 +398,37 @@ export default function Payment() {
                                     </>
                                 )}
                             </button>
-
-                            <p className="text-xs text-center text-gray-400 mt-4 leading-relaxed">
-                                "Ödemeyi Tamamla" butonuna tıklayarak <a href="#" className="underline hover:text-gray-600">Mesafeli Satış Sözleşmesi</a>'ni kabul etmiş olursunuz.
-                            </p>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Modals */}
+            <Modal
+                isOpen={showMembershipModal}
+                onClose={() => setShowMembershipModal(false)}
+                title="Üyelik Sözleşmesi"
+            >
+                <div>
+                    <h4 className="font-bold mb-2">1. Taraflar</h4>
+                    <p className="mb-4">İşbu sözleşme İyilik Adımı ile Kullanıcı arasında akdedilmiştir...</p>
+                    <h4 className="font-bold mb-2">2. Konu</h4>
+                    <p className="mb-4">Sözleşmenin konusu, kullanıcının internet sitesinden faydalanma şartlarının belirlenmesidir.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                </div>
+            </Modal>
+
+            <Modal
+                isOpen={showConsentModal}
+                onClose={() => setShowConsentModal(false)}
+                title="Kişisel Veri Rıza Metni"
+            >
+                <div>
+                    <h4 className="font-bold mb-2">Kişisel Verilerin İşlenmesi</h4>
+                    <p className="mb-4">6698 sayılı Kişisel Verilerin Korunması Kanunu uyarınca...</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                </div>
+            </Modal>
         </div>
     );
 }
