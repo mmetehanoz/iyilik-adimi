@@ -30,6 +30,7 @@ export default function Payment() {
         isAnonymous: false,
         isOnBehalf: false,
         onBehalfOfName: '',
+        note: '',
         agreementsAccepted: false
     });
 
@@ -245,6 +246,18 @@ export default function Payment() {
                                         />
                                     </div>
                                 )}
+                            </div>
+
+                            <div className="pt-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Notunuz (Opsiyonel)</label>
+                                <textarea
+                                    name="note"
+                                    value={formData.note}
+                                    onChange={handleChange}
+                                    rows="3"
+                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none transition-all resize-none"
+                                    placeholder="Bağışınızla ilgili eklemek istediğiniz bir not varsa buraya yazabilirsiniz..."
+                                />
                             </div>
                         </div>
 
