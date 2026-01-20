@@ -7,13 +7,52 @@ export default function Contact() {
     }, []);
 
     const [formStatus, setFormStatus] = useState(null); // null, 'submitting', 'success', 'error'
+    const [phone, setPhone] = useState('');
+
+    const handlePhoneChange = (e) => {
+        let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+
+        // Remove leading 0 if present
+        if (value.startsWith('0')) {
+            value = value.substring(1);
+        }
+
+        // Limit to 10 digits
+        value = value.substring(0, 10);
+
+        // Formatting (5XX) XXX XX XX
+        let formattedValue = '';
+        if (value.length > 0) {
+            formattedValue = '(' + value.substring(0, 3);
+        }
+        if (value.length > 3) {
+            formattedValue += ') ' + value.substring(3, 6);
+        }
+        if (value.length > 6) {
+            formattedValue += ' ' + value.substring(6, 8);
+        }
+        if (value.length > 8) {
+            formattedValue += ' ' + value.substring(8, 10);
+        }
+
+        setPhone(formattedValue);
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Validate Phone
+        const plainPhone = phone.replace(/\D/g, '');
+        if (plainPhone.length !== 10) {
+            alert('Lütfen geçerli bir telefon numarası giriniz: (5XX) XXX XX XX');
+            return;
+        }
+
         setFormStatus('submitting');
         // Simulate API call
         setTimeout(() => {
             setFormStatus('success');
+            setPhone(''); // Reset phone
             e.target.reset();
         }, 1500);
     };
@@ -139,8 +178,11 @@ export default function Contact() {
                                     <input
                                         type="tel"
                                         id="phone"
+                                        value={phone}
+                                        onChange={handlePhoneChange}
+                                        required
                                         className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#12985a] focus:ring-2 focus:ring-[#12985a]/20 outline-none transition-all"
-                                        placeholder="05XX XXX XX XX"
+                                        placeholder="(5XX) XXX XX XX"
                                     />
                                 </div>
                                 <div>
