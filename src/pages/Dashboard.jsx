@@ -229,7 +229,7 @@ function SettingsSection() {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
-                        <input type="text" defaultValue="(555) 123 45 67" className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#12985a] focus:ring-1 focus:ring-[#12985a]" />
+                        <input type="text" defaultValue="+90 (532) 236 57 97" className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#12985a] focus:ring-1 focus:ring-[#12985a]" />
                     </div>
                     <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2">E-Posta Adresi</label>
