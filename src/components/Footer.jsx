@@ -33,7 +33,7 @@ export default function Footer() {
                             <span className="text-2xl">📍</span>
                             <div>
                                 <h4 className="font-semibold text-gray-900 text-sm">Adres</h4>
-                                <p className="text-gray-600 text-sm mt-1">Yukarı Dudullu Mh. Alemdağ Cd.<br />No: 758 B - Ümraniye İstanbul</p>
+                                <p className="text-gray-600 text-sm mt-1">Yukarı Dudullu Mah. Katibim Sk.<br />No:1 D:1 Ümraniye / İstanbul</p>
                             </div>
                         </div>
                         <div className="flex gap-4 items-start">
