@@ -145,18 +145,18 @@ export default function Causes() {
                                         dangerouslySetInnerHTML={{ __html: cause.description }}
                                     />
 
-                                    {cause.percentage > 0 && (
+                                    {(cause.goal > 0 || cause.percentage > 0) && (
                                         <div className="mt-8">
                                             <div className="relative h-1 w-full bg-gray-100">
                                                 <div
                                                     className={`absolute left-0 top-0 h-full ${colorClasses.bar}`}
-                                                    style={{ width: `${Math.min(cause.percentage, 100)}%` }}
+                                                    style={{ width: `${Math.min(cause.percentage || 0, 100)}%` }}
                                                 />
                                                 <div
-                                                    className={`absolute -top-3 ${colorClasses.bg} px-2 py-0.5 text-[10px] font-bold text-white`}
-                                                    style={{ left: `${Math.min(cause.percentage, 100)}%` }}
+                                                    className={`absolute -top-3 ${colorClasses.bg} px-2 py-0.5 text-[10px] font-bold text-white transition-all duration-500`}
+                                                    style={{ left: `${Math.min(cause.percentage || 0, 100)}%` }}
                                                 >
-                                                    {Math.round(cause.percentage)}%
+                                                    {Math.round(cause.percentage || 0)}%
                                                 </div>
                                             </div>
                                         </div>
