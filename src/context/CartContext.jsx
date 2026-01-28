@@ -136,16 +136,27 @@ export function CartProvider({ children }) {
             if (window.turnstile) {
                 try {
                     // Turnstile'dan yeni bir token iste
-                    turnstileToken = await new Promise((resolve) => {
-                        const container = document.getElementById('turnstile-container');
-                        window.turnstile.execute(container, {
-                            sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
-                            callback: (token) => resolve(token),
-                            'error-callback': () => resolve(''),
+                    const container = document.getElementById('turnstile-container');
+                    if (container) {
+                        turnstileToken = await new Promise((resolve) => {
+                            // Varsa eski widgetları temizle
+                            window.turnstile.reset(container);
+
+                            window.turnstile.render(container, {
+                                sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
+                                callback: (token) => {
+                                    resolve(token);
+                                },
+                                'error-callback': () => resolve(''),
+                                'expired-callback': () => resolve(''),
+                                appearance: 'always', // Görünmez olsa bile render et
+                                execution: 'execute',
+                            });
+
+                            // 10 saniye timeout
+                            setTimeout(() => resolve(''), 10000);
                         });
-                        // 10 saniye timeout (daha güvenli)
-                        setTimeout(() => resolve(''), 10000);
-                    });
+                    }
                 } catch (e) {
                     console.error('Turnstile capture failed:', e);
                 }

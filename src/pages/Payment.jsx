@@ -56,33 +56,43 @@ export default function Payment() {
     // Turnstile token listener
     useEffect(() => {
         const handleToken = (e) => {
+            console.log('✅ Turnstile Token Received');
             setTurnstileToken(e.detail);
         };
         window.addEventListener('turnstileToken', handleToken);
 
-        // Debug: Check site key
-        console.log('🔑 Turnstile Site Key:', import.meta.env.VITE_TURNSTILE_SITE_KEY);
+        // Global callback for the widget
+        window.onTurnstileSuccess = (token) => {
+            const event = new CustomEvent('turnstileToken', { detail: token });
+            window.dispatchEvent(event);
+        };
 
-        // Manually trigger render if script is already loaded
-        const observer = new MutationObserver(() => {
-            if (window.turnstile && turnstileRef.current && turnstileRef.current.childNodes.length === 0) {
+        const renderTurnstile = () => {
+            if (window.turnstile && turnstileRef.current && turnstileRef.current.childNodes.length <= 1) {
                 try {
-                    console.log('🔄 Manually rendering Turnstile');
                     window.turnstile.render(turnstileRef.current, {
-                        sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAAxxxxxxxxxx",
+                        sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
                         callback: 'onTurnstileSuccess',
                     });
                 } catch (e) {
                     console.error('Turnstile render error:', e);
                 }
             }
-        });
+        };
 
-        observer.observe(document.body, { childList: true, subtree: true });
+        // Eğer script yüklüyse hemen render et, değilse 1 sn bekle
+        if (window.turnstile) {
+            renderTurnstile();
+        } else {
+            const timer = setTimeout(renderTurnstile, 1500);
+            return () => {
+                clearTimeout(timer);
+                window.removeEventListener('turnstileToken', handleToken);
+            };
+        }
 
         return () => {
             window.removeEventListener('turnstileToken', handleToken);
-            observer.disconnect();
         };
     }, []);
 
@@ -575,8 +585,3 @@ export default function Payment() {
     );
 }
 
-// Global callback for Turnstile
-window.onTurnstileSuccess = function (token) {
-    const event = new CustomEvent('turnstileToken', { detail: token });
-    window.dispatchEvent(event);
-};
