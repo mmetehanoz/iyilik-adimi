@@ -74,52 +74,59 @@ export default function CartDrawer() {
                                 </button>
                             </div>
                         ) : (
-                            cartItems.map((item, index) => (
-                                <div key={index} className="flex gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                    {item.image && (
-                                        <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
-                                    )}
-                                    <div className="flex-1">
-                                        <div className="flex justify-between items-start">
-                                            <h3 className="font-bold text-gray-800 line-clamp-1">{item.name}</h3>
-                                            <button
-                                                onClick={() => removeFromCart(index)}
-                                                className="text-gray-400 hover:text-red-500 transition-colors"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                                                </svg>
-                                            </button>
-                                        </div>
+                            cartItems.map((item) => {
+                                // Backend'den gelen yapı: item.donation = { id, title, image }
+                                const donationImage = item.donation?.image || item.donation_image || item.cin_ali_item?.image;
+                                const donationTitle = item.donation?.title || item.donation_title || item.cin_ali_item?.name;
 
-                                        {item.selectedOption && (
-                                            <p className="text-xs text-gray-500 mt-1">{item.selectedOption}</p>
+                                return (
+                                    <div key={item.id} className="flex gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                        {donationImage && (
+                                            <img src={donationImage} alt={donationTitle} className="w-20 h-20 object-cover rounded-lg" />
                                         )}
-
-                                        <div className="flex items-center justify-between mt-3">
-                                            <div className="flex items-center bg-white rounded-lg border border-gray-200">
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <h3 className="font-bold text-gray-800 line-clamp-1">{donationTitle}</h3>
                                                 <button
-                                                    onClick={() => updateQuantity(index, item.quantity - 1)}
-                                                    className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded-l-lg disabled:opacity-50"
-                                                    disabled={item.quantity <= 1}
+                                                    onClick={() => removeFromCart(item.id)}
+                                                    className="text-gray-400 hover:text-red-500 transition-colors"
                                                 >
-                                                    -
-                                                </button>
-                                                <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-                                                <button
-                                                    onClick={() => updateQuantity(index, item.quantity + 1)}
-                                                    className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded-r-lg"
-                                                >
-                                                    +
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                    </svg>
                                                 </button>
                                             </div>
-                                            <p className="font-bold text-[#12985a]">
-                                                {new Intl.NumberFormat('tr-TR').format(item.price * item.quantity)} ₺
-                                            </p>
+
+                                            {/* Seçenek Gösterimi (varsa form_data içinde) */}
+                                            {item.form_data && item.form_data.selected_country && (
+                                                <p className="text-xs text-gray-500 mt-1">{item.form_data.selected_country}</p>
+                                            )}
+
+                                            <div className="flex items-center justify-between mt-3">
+                                                <div className="flex items-center bg-white rounded-lg border border-gray-200">
+                                                    <button
+                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                        className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded-l-lg disabled:opacity-50"
+                                                        disabled={item.quantity <= 1}
+                                                    >
+                                                        -
+                                                    </button>
+                                                    <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                                                    <button
+                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                        className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded-r-lg"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+                                                <p className="font-bold text-[#12985a]">
+                                                    {new Intl.NumberFormat('tr-TR').format(item.amount || 0)} ₺
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))
+                                );
+                            })
                         )}
                     </div>
 

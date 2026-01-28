@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
 
 // --- CONSTANTS ---
 
@@ -166,6 +167,7 @@ const calculateItemValues = (item, rates) => {
 export default function ZekatCalculator() {
     const [basket, setBasket] = useState([]);
     const [activeCatId, setActiveCatId] = useState('TRY_CASH');
+    const showToast = useToast();
 
     // Form Inputs
     const [amount, setAmount] = useState('');
@@ -202,7 +204,7 @@ export default function ZekatCalculator() {
         });
 
         if (missingRates) {
-            alert("Lütfen listenizdeki tüm varlıklar için 'Alış' ve 'Satış' kur bilgilerini giriniz.");
+            showToast("Lütfen listenizdeki tüm varlıklar için 'Alış' ve 'Satış' kur bilgilerini giriniz.", 'error');
             return;
         }
 

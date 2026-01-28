@@ -1,73 +1,146 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import * as api from '../services/api';
 
 export default function Auth() {
     const navigate = useNavigate();
     const { login } = useAuth();
     const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
-    const [phone, setPhone] = useState('');
     const [isRegisterSuccess, setIsRegisterSuccess] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    // Form States
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [fullName, setFullName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [agreement, setAgreement] = useState(false);
+    const [notification, setNotification] = useState(false);
 
     // OTP States
     const [showOtp, setShowOtp] = useState(false);
     const [otpCode, setOtpCode] = useState('');
+    const [loginEmail, setLoginEmail] = useState(''); // To keep email across OTP step
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        // Here you would normally validate credentials
-        setShowOtp(true);
+        setError('');
+        setIsLoading(true);
+        try {
+            const data = await api.login(email, password);
+            if (data.requires_otp) {
+                setLoginEmail(email);
+                setShowOtp(true);
+            } else {
+                // OTP gerekmiyorsa (backend ayarına bağlı) direkt login
+                login(
+                    { id: data.user_id, email: data.email, name: data.full_name },
+                    { access: data.access, refresh: data.refresh }
+                );
+                navigate('/hesabim');
+            }
+        } catch (err) {
+            setError(err.response?.data?.error || 'Giriş yapılamadı. E-posta veya şifre hatalı.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const handleOtpVerify = (e) => {
+    const handleOtpVerify = async (e) => {
         e.preventDefault();
-        // Here you would validate the OTP code against backend
-        if (otpCode === '123456') {
-            login({ name: 'Metehan Öztürk', email: 'metehan@example.com' });
-            navigate('/hesabim');
-        } else {
-            alert('Hatalı kod! (Test için: 123456)');
+        setError('');
+        setIsLoading(true);
+        try {
+            const data = await api.verifyOtp(phone.replace(/\D/g, '').substring(0, 10), otpCode);
+            if (data.success) {
+                login(
+                    { id: data.user_id, email: data.email, name: data.full_name },
+                    { access: data.access, refresh: data.refresh }
+                );
+                navigate('/hesabim');
+            } else {
+                setError(data.error || 'Doğrulama kodu hatalı.');
+            }
+        } catch (err) {
+            setError(err.response?.data?.error || 'Doğrulama sırasında bir hata oluştu.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        if (password !== confirmPassword) {
+            setError('Şifreler eşleşmiyor.');
+            return;
+        }
+
+        if (!agreement) {
+            setError('Üyelik sözleşmesini kabul etmelisiniz.');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const [firstName, ...lastNameParts] = fullName.split(' ');
+            const lastName = lastNameParts.join(' ');
+
+            const userData = {
+                email,
+                username: email, // Email'i kullanıcı adı olarak kullan
+                password,
+                password2: confirmPassword,
+                first_name: firstName,
+                last_name: lastName || '.',
+                phone_number: phone.replace(/\D/g, '').substring(0, 10),
+                membership_agreement_consent: agreement,
+                notification_consent: notification
+            };
+
+            await api.register(userData);
+            setIsRegisterSuccess(true);
+        } catch (err) {
+            const details = err.response?.data?.details;
+            if (details) {
+                const firstError = Object.values(details)[0];
+                setError(firstError);
+            } else {
+                setError(err.response?.data?.error || 'Kayıt sırasında bir hata oluştu.');
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handlePhoneChange = (e) => {
         let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
-
-        // Remove leading 0 if present
-        if (value.startsWith('0')) {
-            value = value.substring(1);
-        }
-
-        // Limit to 10 digits
+        if (value.startsWith('0')) value = value.substring(1);
         value = value.substring(0, 10);
-
-        // Formatting (5XX) XXX XX XX
         let formattedValue = '';
-        if (value.length > 0) {
-            formattedValue = '(' + value.substring(0, 3);
-        }
-        if (value.length > 3) {
-            formattedValue += ') ' + value.substring(3, 6);
-        }
-        if (value.length > 6) {
-            formattedValue += ' ' + value.substring(6, 8);
-        }
-        if (value.length > 8) {
-            formattedValue += ' ' + value.substring(8, 10);
-        }
-
+        if (value.length > 0) formattedValue = '(' + value.substring(0, 3);
+        if (value.length > 3) formattedValue += ') ' + value.substring(3, 6);
+        if (value.length > 6) formattedValue += ' ' + value.substring(6, 8);
+        if (value.length > 8) formattedValue += ' ' + value.substring(8, 10);
         setPhone(formattedValue);
-    };
-
-    const handleRegister = (e) => {
-        e.preventDefault();
-        // Here you would normally handle the API call
-        setIsRegisterSuccess(true);
     };
 
     return (
         <div className="min-h-screen bg-gray-50 pt-32 pb-20 px-4">
             <div className="mx-auto max-w-lg">
+                {/* Error Message */}
+                {error && (
+                    <div className="mb-6 rounded-xl bg-red-50 p-4 border border-red-100 flex items-center gap-3 animate-shake">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-red-500">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                        </svg>
+                        <p className="text-sm font-medium text-red-700">{error}</p>
+                    </div>
+                )}
                 <div className="flex rounded-full bg-white p-1 mb-8 shadow-sm border border-gray-100">
                     <button
                         onClick={() => setActiveTab('login')}
@@ -109,8 +182,12 @@ export default function Auth() {
                                             placeholder="XXXXXX"
                                         />
                                     </div>
-                                    <button className="w-full rounded-full bg-[#103e6a] py-4 font-bold text-white transition-all hover:opacity-90 hover:shadow-lg">
-                                        DOĞRULA
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="w-full rounded-full bg-[#103e6a] py-4 font-bold text-white transition-all hover:opacity-90 hover:shadow-lg disabled:opacity-50"
+                                    >
+                                        {isLoading ? 'DOĞRULANIYOR...' : 'DOĞRULA'}
                                     </button>
                                     <button
                                         type="button"
@@ -133,8 +210,11 @@ export default function Auth() {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">E-Posta Adresi</label>
                                         <input
                                             type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
                                             className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#12985a] focus:ring-1 focus:ring-[#12985a] transition-all"
                                             placeholder="ornek@email.com"
+                                            required
                                         />
                                     </div>
 
@@ -142,8 +222,11 @@ export default function Auth() {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Şifre</label>
                                         <input
                                             type="password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
                                             className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#12985a] focus:ring-1 focus:ring-[#12985a] transition-all"
                                             placeholder="••••••••"
+                                            required
                                         />
                                     </div>
 
@@ -155,8 +238,12 @@ export default function Auth() {
                                         <a href="#" className="text-sm font-medium text-[#12985a] hover:underline">Şifremi Unuttum</a>
                                     </div>
 
-                                    <button className="w-full rounded-full bg-[#103e6a] py-4 font-bold text-white transition-all hover:opacity-90 hover:shadow-lg">
-                                        GİRİŞ YAP
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="w-full rounded-full bg-[#103e6a] py-4 font-bold text-white transition-all hover:opacity-90 hover:shadow-lg disabled:opacity-50"
+                                    >
+                                        {isLoading ? 'GİRİŞ YAPILIYOR...' : 'GİRİŞ YAP'}
                                     </button>
                                 </form>
                             </>
@@ -200,6 +287,8 @@ export default function Auth() {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Ad Soyad</label>
                                         <input
                                             type="text"
+                                            value={fullName}
+                                            onChange={(e) => setFullName(e.target.value)}
                                             className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#12985a] focus:ring-1 focus:ring-[#12985a] transition-all"
                                             placeholder="Adınız Soyadınız"
                                             required
@@ -222,6 +311,8 @@ export default function Auth() {
                                         <label className="block text-sm font-medium text-gray-700 mb-2">E-Posta Adresi</label>
                                         <input
                                             type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
                                             className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#12985a] focus:ring-1 focus:ring-[#12985a] transition-all"
                                             placeholder="ornek@email.com"
                                             required
@@ -233,6 +324,8 @@ export default function Auth() {
                                             <label className="block text-sm font-medium text-gray-700 mb-2">Şifre</label>
                                             <input
                                                 type="password"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
                                                 className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#12985a] focus:ring-1 focus:ring-[#12985a] transition-all"
                                                 placeholder="••••••••"
                                                 required
@@ -242,6 +335,8 @@ export default function Auth() {
                                             <label className="block text-sm font-medium text-gray-700 mb-2">Şifre Tekrar</label>
                                             <input
                                                 type="password"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
                                                 className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#12985a] focus:ring-1 focus:ring-[#12985a] transition-all"
                                                 placeholder="••••••••"
                                                 required
@@ -252,7 +347,13 @@ export default function Auth() {
                                     <div className="space-y-3 pt-2">
                                         <label className="flex items-start gap-3 cursor-pointer group">
                                             <div className="relative flex items-center">
-                                                <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-[#12985a] focus:ring-[#12985a] mt-0.5" required />
+                                                <input
+                                                    type="checkbox"
+                                                    checked={agreement}
+                                                    onChange={(e) => setAgreement(e.target.checked)}
+                                                    className="w-5 h-5 rounded border-gray-300 text-[#12985a] focus:ring-[#12985a] mt-0.5"
+                                                    required
+                                                />
                                             </div>
                                             <span className="text-sm text-gray-600 leading-tight group-hover:text-gray-900 transition-colors">
                                                 <a href="#" className="font-semibold text-[#12985a] hover:underline">Üyelik Sözleşmesi</a>'ni ve <a href="#" className="font-semibold text-[#12985a] hover:underline">Kişisel Rıza Metni</a>'ni okudum, onaylıyorum.
@@ -261,7 +362,12 @@ export default function Auth() {
 
                                         <label className="flex items-start gap-3 cursor-pointer group">
                                             <div className="relative flex items-center">
-                                                <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-[#12985a] focus:ring-[#12985a] mt-0.5" />
+                                                <input
+                                                    type="checkbox"
+                                                    checked={notification}
+                                                    onChange={(e) => setNotification(e.target.checked)}
+                                                    className="w-5 h-5 rounded border-gray-300 text-[#12985a] focus:ring-[#12985a] mt-0.5"
+                                                />
                                             </div>
                                             <span className="text-sm text-gray-600 leading-tight group-hover:text-gray-900 transition-colors">
                                                 Kampanya ve duyurulardan e-posta ve SMS yoluyla haberdar olmak istiyorum.
@@ -269,8 +375,12 @@ export default function Auth() {
                                         </label>
                                     </div>
 
-                                    <button className="w-full rounded-full bg-[#12985a] py-4 font-bold text-white transition-all hover:bg-[#0e7a48] hover:shadow-lg mt-4">
-                                        ÜYE OL
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="w-full rounded-full bg-[#12985a] py-4 font-bold text-white transition-all hover:bg-[#0e7a48] hover:shadow-lg mt-4 disabled:opacity-50"
+                                    >
+                                        {isLoading ? 'KAYIT YAPILIYOR...' : 'ÜYE OL'}
                                     </button>
                                 </form>
                             </>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useToast } from '../context/ToastContext';
 
 export default function Contact() {
     useEffect(() => {
@@ -8,6 +9,7 @@ export default function Contact() {
 
     const [formStatus, setFormStatus] = useState(null); // null, 'submitting', 'success', 'error'
     const [phone, setPhone] = useState('');
+    const showToast = useToast();
 
     const handlePhoneChange = (e) => {
         let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
@@ -44,7 +46,7 @@ export default function Contact() {
         // Validate Phone
         const plainPhone = phone.replace(/\D/g, '');
         if (plainPhone.length !== 10) {
-            alert('Lütfen geçerli bir telefon numarası giriniz: (5XX) XXX XX XX');
+            showToast('Lütfen geçerli bir telefon numarası giriniz: (5XX) XXX XX XX', 'error');
             return;
         }
 
@@ -52,6 +54,7 @@ export default function Contact() {
         // Simulate API call
         setTimeout(() => {
             setFormStatus('success');
+            showToast('Mesajınız başarıyla iletildi. En kısa sürede size dönüş yapacağız.', 'success');
             setPhone(''); // Reset phone
             e.target.reset();
         }, 1500);

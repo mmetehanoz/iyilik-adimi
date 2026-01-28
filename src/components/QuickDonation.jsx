@@ -1,55 +1,281 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
+import { getQuickDonationSettings } from '../services/api';
+import { useToast } from '../context/ToastContext';
 
 export default function QuickDonation() {
     const [amount, setAmount] = useState('');
-    const [donationType, setDonationType] = useState('genel');
+    const [selectedDonation, setSelectedDonation] = useState('');
+    const [settings, setSettings] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [isAmountDisabled, setIsAmountDisabled] = useState(false);
+    const [placeholder, setPlaceholder] = useState('');
+
     const { addToCart } = useCart();
+    const showToast = useToast();
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const response = await getQuickDonationSettings();
+                console.log("🔍 QuickDonation API Response:", response); // DEBUG
+
+                let settingsData = response;
+                if (response && response.data && !response.is_active) {
+                    settingsData = response.data;
+                } else if (Array.isArray(response)) {
+                    settingsData = response[0];
+                }
+
+                if (settingsData && settingsData.is_active) {
+                    setSettings(settingsData);
+                    // Varsayılan seçim
+                    if (settingsData.default_donation) {
+                        const defVal = typeof settingsData.default_donation === 'object'
+                            ? settingsData.default_donation.id
+                            : settingsData.default_donation;
+                        console.log("Setting default selection:", defVal);
+                        setSelectedDonation(String(defVal));
+                    } else if (settingsData.available_donations && settingsData.available_donations.length > 0) {
+                        setSelectedDonation(String(settingsData.available_donations[0].id));
+                    }
+                } else {
+                    console.warn("Settings not active or empty:", settingsData);
+                    throw new Error("Settings not active or empty");
+                }
+            } catch (error) {
+                console.warn('Hızlı bağış ayarları yüklenemedi, varsayılanlar kullanılıyor:', error);
+                // Fallback / Varsayılan Ayarlar
+                const fallbackSettings = {
+                    is_active: true,
+                    min_amount: 10,
+                    max_amount: 100000,
+                    available_donations: [
+                        { id: 'genel', title: 'Genel Bağış', price_type: 'flexible', min_price: 10, currency: { code: 'TRY' } },
+                        { id: 'kurban', title: 'Kurban Bağışı', price_type: 'flexible', min_price: 5000, currency: { code: 'TRY' } },
+                    ]
+                };
+                setSettings(fallbackSettings);
+                setSelectedDonation('genel');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSettings();
+    }, []);
+
+    // Seçilen bağış değiştiğinde fiyat inputunu ayarla
+    useEffect(() => {
+        if (!settings || !selectedDonation) return;
+
+        const donation = settings.available_donations.find(d => String(d.id) === String(selectedDonation));
+        if (donation) {
+            // Price Logic
+            // Fiyat Hesaplama Mantığı
+            let targetAmount = 0;
+            let isFixed = false;
+            let placeholderText = '';
+
+            // 1. Varyant varsa ve fiyatları geçerliyse en düşük fiyatlı varyantı bul
+            if (donation.donation_types && donation.donation_types.length > 0) {
+                const validVariants = donation.donation_types.filter(v => v.price && parseFloat(v.price) > 0);
+                if (validVariants.length > 0) {
+                    const sortedVariants = validVariants.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+                    targetAmount = parseFloat(sortedVariants[0].price);
+                    isFixed = true;
+                }
+            }
+
+            // Eğer yukarıdan fiyat gelmediyse (varyant yok veya fiyatları 0)
+            if (targetAmount === 0) {
+                // 2. Flexible
+                if (donation.price_type !== 'fixed') {
+                    targetAmount = parseFloat(donation.min_price) || settings.min_amount || 10;
+                    isFixed = false;
+                }
+                // 3. Fixed
+                else {
+                    targetAmount = parseFloat(donation.fixed_price);
+                    isFixed = true;
+                }
+            }
+
+            // Eğer targetAmount 0 veya geçersizse düzelt
+            if (!targetAmount || isNaN(targetAmount)) targetAmount = 0;
+
+            const formatted = new Intl.NumberFormat('tr-TR').format(targetAmount);
+
+            if (isFixed) {
+                setAmount(`${formatted} ₺`);
+                setIsAmountDisabled(true);
+                setPlaceholder(`${formatted} ₺`);
+            } else {
+                setAmount(`${formatted} ₺`);
+                setIsAmountDisabled(false);
+                setPlaceholder(`Min: ${formatted} ₺`);
+            }
+        }
+    }, [selectedDonation, settings]);
 
     const handleAmountChange = (e) => {
-        // Sadece rakamları al
         let value = e.target.value.replace(/\D/g, '');
-
         if (value) {
-            // Türk Lirası formatına çevir (örn: 5.000)
             const formatted = new Intl.NumberFormat('tr-TR').format(value);
-            // Sonuna ₺ ekle (kullanıcı silmek isterse son karakter kontrolü gerekebilir, basit tutuyoruz)
             setAmount(`${formatted} ₺`);
         } else {
             setAmount('');
         }
     };
 
-    const handleDonate = () => {
-        // Remove currency symbol and dots to get raw number
+    const handleDonate = async () => {
         const rawAmount = parseInt(amount.replace(/[^0-9]/g, ''));
 
         if (!rawAmount || rawAmount <= 0) {
-            alert('Lütfen geçerli bir bağış tutarı giriniz.');
+            showToast('Lütfen geçerli bir bağış tutarı giriniz.', 'error');
             return;
         }
 
-        const donationLabels = {
-            'genel': 'Genel Bağış',
-            'kurban': 'Kurban Bağışı',
-            'su_kuyusu': 'Su Kuyusu Bağışı',
-            'egitim': 'Eğitim Yardımı',
-            'sadaka': 'Sadaka'
-        };
+        if (!selectedDonation) {
+            showToast('Lütfen bir bağış türü seçiniz.', 'error');
+            return;
+        }
+
+        const donation = settings.available_donations.find(d => String(d.id) === String(selectedDonation));
+
+        // Validation
+        if (donation) {
+            // Min price check for flexible donations
+            if (donation.price_type !== 'fixed') {
+                let effectiveMinPrice = parseFloat(donation.min_price) || settings.min_amount || 10;
+
+                // Varyant varsa, en düşük varyant fiyatını min price olarak kabul et
+                if (donation.donation_types && donation.donation_types.length > 0) {
+                    const variantPrices = donation.donation_types
+                        .map(v => parseFloat(v.price))
+                        .filter(p => !isNaN(p) && p > 0);
+
+                    if (variantPrices.length > 0) {
+                        const minVariantPrice = Math.min(...variantPrices);
+                        // Eğer varyant fiyatı ana min_price'dan küçükse veya min_price yoksa, varyantı kullan
+                        if (minVariantPrice < effectiveMinPrice || !donation.min_price) {
+                            effectiveMinPrice = minVariantPrice;
+                        }
+                    }
+                }
+
+                if (rawAmount < effectiveMinPrice) {
+                    showToast(`Bu bağış için minimum tutar ${effectiveMinPrice} ₺'dir.`, 'error');
+                    return;
+                }
+            }
+
+            // Global limits check
+            if (settings) {
+                const max = parseFloat(settings.max_amount) || 100000;
+                if (rawAmount > max) {
+                    showToast(`Maximum bağış tutarı ${max} ₺'dir.`, 'error');
+                    return;
+                }
+            }
+        }
+
+        // Fallback donation logic if not found
+        let targetDonation = donation;
+        if (!targetDonation) {
+            if (selectedDonation === 'genel') targetDonation = { id: 'genel', title: 'Genel Bağış', type: 'donation' };
+            else if (selectedDonation === 'kurban') targetDonation = { id: 'kurban', title: 'Kurban Bağışı', type: 'donation' };
+        }
+
+        if (!targetDonation) {
+            alert('Hata: Bağış bulunamadı.');
+            return;
+        }
+
+        // Fiyat ve Varyant Eşleştirme Mantığı
+        let selectedVariant = null;
+        let submissionCountry = "";
+        let submissionType = targetDonation.title; // Fallback
+
+        if (targetDonation.donation_types && targetDonation.donation_types.length > 0) {
+            // Price'a uyan varyantları bul
+            const matchingVariants = targetDonation.donation_types.filter(v => parseFloat(v.price) === rawAmount);
+
+            if (matchingVariants.length > 0) {
+                // Eşleşen varsa ilkini kullan (genellikle en mantıklısı veya sıralamada ilk geleni)
+                selectedVariant = matchingVariants[0];
+
+                // Eğer varyantın description'ı ülke içeriyorsa veya adında ülke varsa ayrıştırılabilir
+                // Ancak API'den gelen donation_types genellikle sadece {id, name, price, description} dönüyor
+                // Backend'den gelen price_variants verisi varsa daha net olurdu.
+                // Şimdilik donation_types içindeki name'i type olarak kullanalım.
+                submissionType = selectedVariant.name;
+
+                // Eğer QuickDonation component'inde varyantın ülke bilgisini tutan bir yapı yoksa (ki şu an yok gibi)
+                // Backend 'price_variants' (Country + Type + Price) verisini frontend'e 'donation_types' içinde mi gönderiyor?
+                // serializers.py'da DonationListSerializer -> get_donation_types varyant fiyatını override ediyor ama ülke bilgisini eklemiyor.
+                // DonationListSerializer -> get_price_variants ise FULL varyant listesi dönüyor.
+
+                // Burada `donation.price_variants`'a erişmemiz lazım.
+                if (targetDonation.price_variants && targetDonation.price_variants.length > 0) {
+                    const exactVariant = targetDonation.price_variants.find(v => parseFloat(v.price) === rawAmount);
+                    if (exactVariant) {
+                        submissionCountry = exactVariant.country || "";
+                        // donation_type_id varsa onu bulup adını alabiliriz ama şimdilik name'i variant'tan almak zor olabilir
+                        // serializer da country name dönüyor string olarak.
+                    }
+                }
+            }
+        }
 
         const item = {
-            id: `quick-${donationType}`,
-            name: donationLabels[donationType] || 'Bağış',
+            id: targetDonation.id,
+            name: targetDonation.title,
             price: rawAmount,
             quantity: 1,
-            selectedOption: 'Varsayılan', // Default option for compatibility
-            image: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=200&auto=format&fit=crop' // Generic image
+            selectedOption: submissionCountry || submissionType, // Sepette görünen özet bilgi
+            image: targetDonation.image || 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=200&auto=format&fit=crop',
+            currency: targetDonation.currency || { code: 'TRY' },
+            type: 'donation',
+            donation_type: submissionType,
+            slug: targetDonation.slug || '',
+            _submissionData: {
+                donation: targetDonation.id,
+                amount: rawAmount,
+                currency: (targetDonation.currency && targetDonation.currency.id) ? targetDonation.currency.id : 1,
+                selected_country: submissionCountry, // Bulunan ülke veya boş string (backend validate_selected_country '' kabul ediyor)
+                donation_type: submissionType,
+                form_data: { // Form data'yı da doldur
+                    selected_country: submissionCountry,
+                    donation_type: submissionType
+                }
+            }
         };
 
-        addToCart(item);
-        // Optional: Reset form or give feedback is handled by cart drawer opening
-        setAmount('');
+        await addToCart(item);
+        if (!isAmountDisabled) {
+            setAmount('');
+        }
     };
+
+    if (loading) {
+        return (
+            <div className="absolute -bottom-10 left-0 right-0 z-20">
+                <div className="mx-auto max-w-7xl px-4">
+                    <div className="rounded-2xl bg-black/70 text-white backdrop-blur p-6 border-2 border-[#12985a]">
+                        <div className="flex justify-center">
+                            <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Settings varsa göster
+    if (!settings || !settings.is_active) {
+        return null;
+    }
 
     return (
         <div className="absolute -bottom-10 left-0 right-0 z-20">
@@ -58,15 +284,15 @@ export default function QuickDonation() {
                     <div>
                         <label className="text-xs uppercase tracking-wide text-white/70">BAĞIŞ TÜRÜ</label>
                         <select
-                            value={donationType}
-                            onChange={(e) => setDonationType(e.target.value)}
+                            value={selectedDonation}
+                            onChange={(e) => setSelectedDonation(e.target.value)}
                             className="mt-2 w-full rounded-md bg-white/10 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-[#12985a] [&>option]:text-black"
                         >
-                            <option value="genel">Genel Bağış</option>
-                            <option value="kurban">Kurban</option>
-                            <option value="su_kuyusu">Su Kuyusu</option>
-                            <option value="egitim">Eğitim Yardımı</option>
-                            <option value="sadaka">Sadaka</option>
+                            {settings.available_donations && settings.available_donations.map((donation) => (
+                                <option key={donation.id} value={donation.id}>
+                                    {donation.title}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div>
@@ -75,8 +301,9 @@ export default function QuickDonation() {
                             type="text"
                             value={amount}
                             onChange={handleAmountChange}
-                            className="mt-2 w-full rounded-md bg-white/10 px-4 py-3 placeholder-white/50 outline-none focus:ring-2 focus:ring-[#12985a]"
-                            placeholder="Örn: 500 ₺"
+                            disabled={isAmountDisabled}
+                            className={`mt-2 w-full rounded-md bg-white/10 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-[#12985a] placeholder-white/50 ${isAmountDisabled ? 'opacity-70 cursor-not-allowed bg-white/5' : ''}`}
+                            placeholder={placeholder}
                         />
                     </div>
                     <div className="flex items-end">

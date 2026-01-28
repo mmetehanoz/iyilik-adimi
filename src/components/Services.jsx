@@ -4,6 +4,7 @@ import service1 from '../assets/service-1.jpg';
 import service2 from '../assets/service-2.jpg';
 import service3 from '../assets/service-3.jpg';
 import testimonyImg from '../assets/testimony.jpg';
+import RecentDonations from './RecentDonations';
 
 export default function Services() {
     return (
@@ -38,103 +39,10 @@ export default function Services() {
                 </div>
             </div>
 
-            {/* Pricing/Support Cards */}
+            {/* Recent Donations Section */}
             <div className="bg-gray-50 py-24">
                 <div className="mx-auto max-w-7xl px-4">
-                    <div className="grid gap-8 lg:grid-cols-3">
-                        {/* Card 1: Monthly Help */}
-                        <div className="group relative overflow-hidden rounded-xl bg-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl">
-                            <div className="h-64 overflow-hidden">
-                                <img src={service1} alt="Aylık Destek" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                            </div>
-                            <div className="p-8 text-center">
-                                <h4 className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-500">AYLIK DESTEK</h4>
-                                <div className="mb-1 flex justify-center text-[#12985a]">
-                                    <span className="text-5xl font-black">150</span>
-                                    <span className="mt-2 text-xl font-bold">₺</span>
-                                </div>
-                                <p className="mb-6 text-sm font-bold text-gray-400">/ ÇOCUK</p>
-
-                                <ul className="mb-8 space-y-3 text-left text-sm text-gray-600">
-                                    <li className="flex items-center gap-2">
-                                        <span className="text-[#12985a]">✓</span> Eğitim ve kırtasiye desteği
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <span className="text-[#12985a]">✓</span> Sağlık taramaları
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <span className="text-[#12985a]">✓</span> Düzenli gıda yardımı
-                                    </li>
-                                </ul>
-
-                                <button className="w-full rounded-full bg-[#103e6a] px-6 py-3 text-xs font-bold text-white transition-colors hover:opacity-90">
-                                    DAHA FAZLA
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Card 2: Annual Help (Highlighted) */}
-                        <div className="group relative -mt-4 overflow-hidden rounded-xl bg-[#103e6a] text-white shadow-2xl ring-4 ring-[#103e6a]/20 transition-all hover:-translate-y-1 lg:-mt-8">
-                            <div className="h-64 overflow-hidden opacity-90">
-                                <img src={service2} alt="Yıllık Destek" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                            </div>
-                            <div className="p-8 text-center">
-                                <h4 className="mb-2 text-xs font-bold uppercase tracking-widest text-white/70">YILLIK DESTEK</h4>
-                                <div className="mb-1 flex justify-center text-white">
-                                    <span className="text-5xl font-black">1800</span>
-                                    <span className="mt-2 text-xl font-bold">₺</span>
-                                </div>
-                                <p className="mb-6 text-sm font-bold text-white/50">/ AİLE</p>
-
-                                <ul className="mb-8 space-y-3 text-left text-sm text-white/80">
-                                    <li className="flex items-center gap-2">
-                                        <span className="text-[#12985a]">✓</span> Kira ve yakacak yardımı
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <span className="text-[#12985a]">✓</span> Giyim ve eşya desteği
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <span className="text-[#12985a]">✓</span> Acil durum fonu
-                                    </li>
-                                </ul>
-
-                                <button className="w-full rounded-full bg-white px-6 py-3 text-xs font-bold text-[#103e6a] transition-colors hover:bg-gray-100">
-                                    BAĞIŞ YAP
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Card 3: One Time */}
-                        <div className="group relative overflow-hidden rounded-xl bg-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl">
-                            <div className="h-64 overflow-hidden">
-                                <img src={service3} alt="Tek Seferlik" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                            </div>
-                            <div className="p-8 text-center">
-                                <h4 className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-500">TEK SEFERLİK</h4>
-                                <div className="mb-1 flex justify-center text-[#12985a]">
-                                    <span className="text-5xl font-black">1650</span>
-                                    <span className="mt-2 text-xl font-bold">₺</span>
-                                </div>
-                                <p className="mb-6 text-sm font-bold text-gray-400">/ OKUL</p>
-
-                                <ul className="mb-8 space-y-3 text-left text-sm text-gray-600">
-                                    <li className="flex items-center gap-2">
-                                        <span className="text-[#12985a]">✓</span> Tadilat ve onarım
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <span className="text-[#12985a]">✓</span> Kütüphane kurulumu
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <span className="text-[#12985a]">✓</span> Su kuyusu açılışı
-                                    </li>
-                                </ul>
-
-                                <button className="w-full rounded-full bg-[#103e6a] px-6 py-3 text-xs font-bold text-white transition-colors hover:opacity-90">
-                                    İLETİŞİME GEÇ
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <RecentDonations />
                 </div>
             </div>
 

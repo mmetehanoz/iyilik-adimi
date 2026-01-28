@@ -1,134 +1,122 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/free-mode';
+import { getCategories, getDonations } from '../services/api';
+import { useToast } from '../context/ToastContext';
 
-// Donation Data Structure with Images and Descriptions
-// Reliable Image Mappings
-const categoryImages = {
-    kurban: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?q=80&w=800&auto=format&fit=crop', // Cow/Farm
-    gazze: 'https://images.unsplash.com/photo-1534777367038-9404f45b869a?q=80&w=800&auto=format&fit=crop', // Tents/Camp
-    yemek: 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?q=80&w=800&auto=format&fit=crop', // Food serving
-    kumanya: 'https://images.unsplash.com/photo-1504805572947-34fad45aed93?q=80&w=800&auto=format&fit=crop', // Grocery/Box
-    genel: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800&auto=format&fit=crop', // Charity/Helping
-    sukuyusu: 'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?q=80&w=800&auto=format&fit=crop', // Water
-    nakdi: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=800&auto=format&fit=crop', // Hands giving
-    acil: 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=80&w=800&auto=format&fit=crop' // Emergency/Dark
+// Helper to assign icons based on category name
+const getCategoryIcon = (name) => {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes('kurban')) return '🐑';
+    if (lowerName.includes('gazze')) return '🇵🇸';
+    if (lowerName.includes('yemek') || lowerName.includes('gıda') || lowerName.includes('iftar')) return '🍲';
+    if (lowerName.includes('su') || lowerName.includes('kuyu')) return '💧';
+    if (lowerName.includes('yetim') || lowerName.includes('çocuk')) return '👦';
+    if (lowerName.includes('acil')) return '🚨';
+    if (lowerName.includes('eğitim') || lowerName.includes('kırtasiye') || lowerName.includes('öğrenci')) return '✏️';
+    if (lowerName.includes('sağlık') || lowerName.includes('ilaç')) return '⚕️';
+    if (lowerName.includes('nakdi') || lowerName.includes('zekat') || lowerName.includes('sadaka')) return '💰';
+    if (lowerName.includes('kumanya')) return '📦';
+    return '🌍';
 };
 
-const donationCategories = [
-    {
-        id: 'kurban',
-        title: 'KURBAN',
-        icon: '🐑',
-        items: [
-            {
-                id: 'inek',
-                name: 'İnek',
-                price: 60000,
-                image: categoryImages.kurban,
-                description: 'İhtiyaç sahibi aileler için büyükbaş kurban bağışı.'
-            },
-            {
-                id: 'koyun',
-                name: 'Koyun',
-                price: 7000,
-                image: 'https://images.unsplash.com/photo-1484557985045-edf25e08da73?q=80&w=800&auto=format&fit=crop',
-                description: 'Mazlum coğrafyalarda küçükbaş kurban sevinci yaşatın.'
-            },
-            {
-                id: 'keci',
-                name: 'Keçi',
-                price: 6000,
-                image: 'https://images.unsplash.com/photo-1524024973431-2ad916746881?q=80&w=800&auto=format&fit=crop',
-                description: 'Afrika ve Asya\'da ihtiyaç sahiplerine keçi kurbanı ulaştırın.'
-            }
-        ]
-    },
-    {
-        id: 'gazze',
-        title: 'GAZZE',
-        icon: '🇵🇸',
-        items: [
-            { id: 'gazze_acil', name: 'Acil Yardım', price: 100, min: true, image: categoryImages.gazze, description: 'Gazze\'deki kardeşlerimize acil insani yardım ulaştırıyoruz.' },
-            { id: 'gazze_yemek', name: '1 Öğün Yemek', price: 150, image: categoryImages.yemek, description: 'Savaş mağduru bir kişiye sıcak yemek ikramı.' },
-            { id: 'gazze_su', name: '1 Hisse Su Bedeli', price: 50, image: categoryImages.sukuyusu, description: 'Temiz suya erişimi olmayanlar için su desteği.' },
-            { id: 'gazze_cadir', name: 'Çadır', price: 45000, image: categoryImages.gazze, description: 'Evsiz kalan aileler için barınma (çadır) desteği.' }
-        ]
-    },
-    {
-        id: 'yemek',
-        title: 'YEMEK',
-        icon: '🍲',
-        items: [
-            { id: 'yemek_3', name: '3 Kişilik Yemek', price: 240, image: categoryImages.yemek, description: 'Bir aile için sıcak iftar veya akşam yemeği.' },
-            { id: 'yemek_5', name: '5 Kişilik Yemek', price: 400, image: categoryImages.yemek, description: 'Geniş bir aileye sofra kurun.' },
-            { id: 'yemek_10', name: '10 Kişilik Yemek', price: 800, image: categoryImages.yemek, description: 'Kalabalık sofralara bereket olun.' },
-            { id: 'yemek_100', name: '100 Kişilik Yemek', price: 8000, image: categoryImages.yemek, description: 'Bir köy veya kamp için toplu yemek organizasyonu.' },
-            { id: 'yemek_500', name: '500 Kişilik Yemek', price: 40000, image: categoryImages.yemek, description: 'Büyük çaplı yemek dağıtımı ile yüzleri güldürün.' }
-        ]
-    },
-    {
-        id: 'kumanya',
-        title: 'KUMANYA',
-        icon: '📦',
-        items: [
-            { id: 'kumanya_paketi', name: 'Kumanya Bedeli', price: 1600, image: categoryImages.kumanya, description: 'Bir ailenin bir aylık temel gıda ihtiyacını karşılayan paket.' }
-        ]
-    },
-    {
-        id: 'genel',
-        title: 'GENEL BAĞIŞ',
-        icon: '🌍',
-        items: [
-            { id: 'sut_kecisi', name: 'Süt Keçisi', price: 3000, image: 'https://images.unsplash.com/photo-1524024973431-2ad916746881?q=80&w=800&auto=format&fit=crop', description: 'Ailelere sürdürülebilir geçim kaynağı sağlayın.' },
-            { id: 'ekmek', name: 'Ekmek', price: 10, options: ['Somali', 'Afganistan'], image: categoryImages.yemek, description: 'Fırınlarda pişirilen sıcak ekmekleri ihtiyaç sahiplerine ulaştırıyoruz.' },
-            { id: 'su_tankeri_yemen', name: 'Su Tankeri (Yemen)', price: 2000, image: categoryImages.sukuyusu, description: 'Yemen\'de susuzlukla mücadele eden köylere tankerle su taşıyoruz.' },
-            { id: 'su_tankeri_gazze', name: 'Su Tankeri (Gazze)', price: 24000, image: categoryImages.sukuyusu, description: 'Gazze\'de temiz suya erişim için tanker desteği.' },
-            { id: 'elbise', name: 'Elbise Dağıtımı', price: 1000, options: ['Afganistan', 'Somali'], quantities: [1, 3, 5], image: categoryImages.genel, description: 'Çocuklara ve yetişkinlere yeni bayramlık ve günlük kıyafetler.' },
-            { id: 'kuran', name: 'Kuran-ı Kerim Bağış', price: 500, desc: '5 Adet', options: ['Somali', 'Afganistan', 'Tanzanya'], quantities: [5, 10, 20, 50], image: categoryImages.genel, description: 'Kuran-ı Kerim\'e ulaşamayan öğrencilere hediye edin.' },
-            { id: 'hijyen', name: 'Temizlik Hijyen Paketi', price: 1750, options: ['Tanzanya', 'Yemen'], quantities: [1, 3, 5], image: categoryImages.acil, description: 'Salgın hastalıklara karşı sabun, deterjan vb. içeren hijyen seti.' },
-            { id: 'kirtasiye_dis', name: 'Kırtasiye (Yurt Dışı)', price: 2000, options: ['Tanzanya', 'Yemen'], quantities: [1, 3, 5, 10], image: categoryImages.genel, description: 'Okul çantası, defter, kalem gibi eğitim materyalleri.' },
-            { id: 'kirtasiye_tr', name: 'Kırtasiye (Türkiye)', price: 3000, quantities: [1, 3, 5, 10], image: categoryImages.genel, description: 'Türkiye\'deki ihtiyaç sahibi öğrenciler için eğitim seti.' }
-        ]
-    },
-    {
-        id: 'sukuyusu',
-        title: 'SU KUYUSU',
-        icon: '💧',
-        items: [
-            { id: 'su_hisseli', name: 'Hisseli Su Kuyusu (1 Hisse)', price: 500, options: ['Bangladeş', 'Somali', 'Tanzanya'], quantities: [1, 2, 3, 4, 5, 10], image: categoryImages.sukuyusu, description: 'Bir su kuyusuna hisse ile ortak olun.' },
-            { id: 'tek_tulumbali_fayansli', name: 'Tek Tulumbalı Kuyu (Bangladeş - Fayanslı)', price: 19000, image: categoryImages.sukuyusu, description: 'Bangladeş\'te uzun ömürlü, fayans kaplamalı tulumba.' },
-            { id: 'tek_tulumbali_fayanssiz', name: 'Tek Tulumbalı Kuyu (Bangladeş - Fayanssız)', price: 12000, image: categoryImages.sukuyusu, description: 'Bangladeş köylerinde ekonomik su çözümü.' },
-            { id: 'sadirvan_tanzanya', name: 'Şadırvanlı Kuyu (Tanzanya)', price: 93000, image: categoryImages.sukuyusu, description: 'Cami yanına veya köy meydanına çok musluklu şadırvanlı kuyu.' },
-            { id: 'sadirvan_banglades', name: 'Şadırvanlı Kuyu (Bangladeş)', price: 45000, image: categoryImages.sukuyusu, description: 'Bangladeş\'te toplu kullanıma uygun şadırvanlı sistem.' },
-            { id: 'sadirvan_afganistan', name: 'Şadırvanlı Kuyu (Afganistan)', price: 45000, image: categoryImages.sukuyusu, description: 'Afganistan\'da kuraklığa karşı kalıcı çözüm.' }
-        ]
-    },
-    {
-        id: 'nakdi',
-        title: 'NAKDİ YARDIM',
-        icon: '💰',
-        items: [
-            { id: 'sadaka', name: 'Sadaka', price: 100, min: true, options: ['Afganistan', 'Yemen', 'Bangladeş', 'Tanzanya', 'Gazze', 'Somali'], image: categoryImages.nakdi, description: 'Belaları def eden, malı bereketlendiren sadaka bağışı.' },
-            { id: 'zekat', name: 'Zekat', price: 100, min: true, options: ['Afganistan', 'Yemen', 'Bangladeş', 'Tanzanya', 'Gazze', 'Somali'], image: categoryImages.nakdi, description: 'Dinen farz olan zekatınızı ihtiyaç sahiplerine ulaştırıyoruz.' },
-            { id: 'ogrenci', name: 'Öğrenci Yardımı', price: 100, min: true, options: ['Türkiye', 'Tanzanya', 'Yemen'], image: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=800&auto=format&fit=crop', description: 'Eğitim hayatını sürdüren öğrencilere maddi destek.' }
-        ]
-    },
-    {
-        id: 'acil',
-        title: 'ACİL YARDIMLAR',
-        icon: '🚨',
-        items: [
-            { id: 'acil_genel', name: 'Acil Yardım', price: 100, min: true, options: ['Türkiye', 'Afganistan', 'Yemen', 'Bangladeş', 'Tanzanya', 'Gazze', 'Somali'], image: categoryImages.acil, description: 'Afet ve kriz bölgelerine hızlı müdahale fonu.' }
-        ]
-    }
-];
+// Placeholder image if backend sends none
+const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800&auto=format&fit=crop';
 
 export default function Donations() {
-    const [activeTab, setActiveTab] = useState(donationCategories[0].id);
+    const [categories, setCategories] = useState([]);
+    const [activeTab, setActiveTab] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                // 1. Kategorileri ve tüm bağışları paralel çek
+                const [catsData, donationsData] = await Promise.all([
+                    getCategories(),
+                    getDonations() // Tüm aktif bağışları çeker
+                ]);
+
+                const rawCategories = Array.isArray(catsData) ? catsData : (catsData.results || []);
+                const rawDonations = Array.isArray(donationsData) ? donationsData : (donationsData.results || []);
+
+                // Kategorileri frontend yapısına dönüştür
+                const processedCategories = rawCategories.map(cat => {
+                    // Bu kategoriye ait bağışları filtrele
+                    const catItems = rawDonations.filter(d => d.category_id === cat.id).map(d => ({
+                        id: d.id,
+                        slug: d.slug,
+                        name: d.title,
+                        category_name: cat.name, // Kategori adı eklendi
+                        description: d.short_description || d.description,
+                        price: parseFloat(d.fixed_price || d.min_price || 0),
+                        min_price: parseFloat(d.min_price || 0),
+                        is_fixed: d.price_type === 'fixed',
+                        image: d.image || PLACEHOLDER_IMAGE,
+                        available_countries: d.available_countries || [],
+                        donation_types: d.donation_types || [],
+                        price_variants: d.price_variants || [], // Backend'den gelen yeni alan
+                        currency: d.currency,
+                        original_data: d
+                    }));
+
+                    return {
+                        id: cat.id,
+                        title: cat.name.toUpperCase(),
+                        icon: getCategoryIcon(cat.name),
+                        items: catItems
+                    };
+                }).filter(cat => cat.items.length > 0); // İçi boş kategorileri gösterme
+
+                setCategories(processedCategories);
+                if (processedCategories.length > 0) {
+                    setActiveTab(processedCategories[0].id);
+                }
+
+            } catch (err) {
+                console.error("Veri yükleme hatası:", err);
+                setError("Bağışlar yüklenirken bir sorun oluştu. Lütfen daha sonra tekrar deneyiniz.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-[#103e6a] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-[#103e6a] font-medium">Bağışlar Yükleniyor...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center p-8">
+                    <div className="text-red-500 text-5xl mb-4">⚠️</div>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Hata Oluştu</h2>
+                    <p className="text-gray-600">{error}</p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="mt-6 px-6 py-2 bg-[#103e6a] text-white rounded-lg hover:bg-opacity-90"
+                    >
+                        Tekrar Dene
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 pt-28 pb-16">
@@ -145,14 +133,14 @@ export default function Donations() {
                             spaceBetween={12}
                             freeMode={true}
                             autoplay={{
-                                delay: 2000,
+                                delay: 3000,
                                 disableOnInteraction: false,
                                 pauseOnMouseEnter: true
                             }}
                             modules={[FreeMode, Autoplay]}
                             className="w-full !pb-4 !px-1"
                         >
-                            {donationCategories.map((cat) => (
+                            {categories.map((cat) => (
                                 <SwiperSlide key={cat.id} className="!w-auto">
                                     <button
                                         onClick={() => setActiveTab(cat.id)}
@@ -173,7 +161,7 @@ export default function Donations() {
                     {/* Content Area */}
                     <div className="w-full">
                         <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500 border border-gray-100">
-                            {donationCategories.map((cat) => {
+                            {categories.map((cat) => {
                                 if (cat.id !== activeTab) return null;
 
                                 return (
@@ -183,11 +171,15 @@ export default function Donations() {
                                             <h2 className="text-2xl font-bold text-[#103e6a]">{cat.title}</h2>
                                         </div>
 
-                                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                                            {cat.items.map((item) => (
-                                                <DonationCard key={item.id} item={item} />
-                                            ))}
-                                        </div>
+                                        {cat.items.length === 0 ? (
+                                            <p className="text-gray-500 text-center py-8">Bu kategoride henüz gösterilecek bağış bulunmamaktadır.</p>
+                                        ) : (
+                                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                                {cat.items.map((item) => (
+                                                    <DonationCard key={item.id} item={item} />
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })}
@@ -200,27 +192,141 @@ export default function Donations() {
 }
 
 function DonationCard({ item }) {
-    const [selectedOption, setSelectedOption] = useState(item.options ? item.options[0] : null);
-    const [selectedQty, setSelectedQty] = useState(item.quantities ? item.quantities[0] : 1);
-    const [amount, setAmount] = useState(item.price || '');
+    // States
+    const [selectedCountry, setSelectedCountry] = useState(
+        item.available_countries && item.available_countries.length > 0 ? item.available_countries[0] : null
+    );
+
+    // Varyantı varsayılan olarak seç, fiyata göre sıralı (küçükten büyüğe)
+    const [selectedType, setSelectedType] = useState(() => {
+        if (item.donation_types && item.donation_types.length > 0) {
+            const sorted = [...item.donation_types].sort((a, b) => (a.price || 0) - (b.price || 0));
+            return sorted[0];
+        }
+        return null;
+    });
+
+    const [amount, setAmount] = useState('');
+    const [quantity, setQuantity] = useState(1);
     const { addToCart } = useCart();
+    const showToast = useToast();
+
+    // Determine Logic Type
+    const hasVariants = item.donation_types && item.donation_types.length > 0;
+    const isFixed = item.is_fixed;
+
+
+
+    // Logic Calculation with Price Variants Lookup
+    let currentPrice = 0;
+
+    if (hasVariants && selectedType) {
+        // 1. Önce tam eşleşme (Ülke + Tip) ara
+        let variant = null;
+        if (selectedCountry) {
+            variant = item.price_variants.find(v =>
+                v.donation_type_id === selectedType.id &&
+                v.country === selectedCountry
+            );
+        }
+
+        // 2. Bulunamazsa sadece Tip eşleşmesi ara (Ülke bağımsız varyant)
+        if (!variant) {
+            variant = item.price_variants.find(v =>
+                v.donation_type_id === selectedType.id &&
+                !v.country
+            );
+        }
+
+        if (variant) {
+            // Varyant tablosundan gelen fiyat
+            currentPrice = parseFloat(variant.price);
+        } else {
+            // Hiçbiri yoksa DonationType'ın kendi fiyatı
+            currentPrice = parseFloat(selectedType.price || 0);
+        }
+
+        // Fallback: Eğer hala 0 ise ve bağışın ana fiyatı varsa onu kullan
+        if (currentPrice === 0 && item.price > 0) {
+            currentPrice = item.price;
+        }
+
+    } else if (isFixed) {
+        // Fixed Price - Check for country-specific variant first
+        let variant = null;
+        if (selectedCountry) {
+            variant = item.price_variants.find(v =>
+                v.country === selectedCountry &&
+                !v.donation_type_id
+            );
+        }
+
+        if (variant) {
+            currentPrice = parseFloat(variant.price);
+        } else {
+            // Donation.jsx mapping uses item.price for fixed_price/min_price
+            currentPrice = parseFloat(item.price || 0);
+        }
+    } else {
+        // Flexible
+        currentPrice = amount ? parseFloat(amount) : 0;
+    }
 
     const handleAddToCart = () => {
-        // For variable price items (min limit)
-        let finalPrice = item.price;
-        if (!item.price || item.min) {
-            if (!amount || Number(amount) < (item.price || 0)) {
-                alert(`Lütfen geçerli bir tutar giriniz. (Minimum: ${item.price} ₺)`);
+        // Validation
+        if (!isFixed && !hasVariants) {
+            // Flexible validation
+            const min = item.min_price || 0;
+            if (!amount || parseFloat(amount) < min) {
+                showToast(`Lütfen minimum ${min} ₺ tutarında bağış giriniz.`, 'error');
                 return;
             }
-            finalPrice = Number(amount);
+        }
+
+        // Fiyat Güvenlik Kontrolü
+        if (!currentPrice || currentPrice <= 0) {
+            console.error("Fiyat Hatası:", { currentPrice, selectedType, selectedCountry });
+            showToast("Bağış tutarı geçersiz (0 TL). Lütfen seçimlerinizi kontrol ediniz.", 'error');
+            return;
+        }
+
+        // Eğer selectedCountry null ise ve available_countries varsa, ilkini seç (fallback)
+        let finalSelectedCountry = selectedCountry;
+        if (!finalSelectedCountry && item.available_countries && item.available_countries.length > 0) {
+            finalSelectedCountry = item.available_countries[0];
         }
 
         const cartItem = {
-            ...item,
-            price: finalPrice,
-            selectedOption,
-            quantity: item.quantities ? selectedQty : 1
+            id: item.id,
+            name: item.name,
+            image: item.image,
+            price: currentPrice,
+            selectedOption: selectedType ? selectedType.name : (finalSelectedCountry || null),
+            // Backend için detaylar (Eski yöntem)
+            selected_country: finalSelectedCountry || null,
+            donation_type: selectedType
+                ? selectedType.name
+                : (isFixed ? 'Genel Bağış' : `${item.category_name} ${item.name}`),
+            // Yeni Güvenli Yöntem: _submissionData
+            _submissionData: {
+                donation: item.id,
+                amount: currentPrice,
+                currency: (item.currency && typeof item.currency === 'object') ? item.currency.id : item.currency,
+                selected_country: finalSelectedCountry, // Doğru ülke ismi
+                donation_type: selectedType
+                    ? selectedType.name
+                    : (isFixed ? 'Genel Bağış' : `${item.category_name} ${item.name}`),
+                form_data: {
+                    selected_country: finalSelectedCountry,
+                    donation_type: selectedType
+                        ? selectedType.name
+                        : (isFixed ? 'Genel Bağış' : `${item.category_name} ${item.name}`)
+                }
+            },
+            quantity: hasVariants ? 1 : quantity,
+            currency: item.currency,
+            type: 'donation',
+            slug: item.slug
         };
 
         addToCart(cartItem);
@@ -234,52 +340,71 @@ function DonationCard({ item }) {
                     src={item.image}
                     alt={item.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => { e.target.src = PLACEHOLDER_IMAGE; }}
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                    <h3 className="font-bold text-white text-lg">{item.name}</h3>
+                    <h3 className="font-bold text-white text-lg leading-tight">{item.name}</h3>
                 </div>
             </div>
 
             <div className="p-5 flex-1 flex flex-col">
-                {item.desc && <p className="text-xs text-[#12985a] font-bold mb-2 uppercase tracking-wide">{item.desc}</p>}
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">{item.description}</p>
+                <div
+                    className="text-sm text-gray-600 mb-4 line-clamp-3"
+                    dangerouslySetInnerHTML={{ __html: item.description }}
+                />
 
                 <div className="mt-auto space-y-3">
-                    {item.options && (
+
+                    {/* Ülke Seçimi */}
+                    {item.available_countries && item.available_countries.length > 0 && (
                         <div>
                             <label className="text-xs font-semibold text-gray-500 uppercase">Ülke</label>
                             <select
                                 className="w-full mt-1 p-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-[#12985a] outline-none bg-gray-50"
-                                value={selectedOption}
-                                onChange={(e) => setSelectedOption(e.target.value)}
+                                value={selectedCountry || ''}
+                                onChange={(e) => setSelectedCountry(e.target.value)}
                             >
-                                {item.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                {item.available_countries.map(country => (
+                                    <option key={country} value={country}>{country}</option>
+                                ))}
                             </select>
                         </div>
                     )}
 
-                    {item.quantities && (
+                    {/* Varyant (Adet) Seçimi */}
+                    {hasVariants && (
                         <div>
-                            <label className="text-xs font-semibold text-gray-500 uppercase">Adet</label>
+                            <label className="text-xs font-semibold text-gray-500 uppercase">ADET</label>
                             <select
                                 className="w-full mt-1 p-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-[#12985a] outline-none bg-gray-50"
-                                value={selectedQty}
-                                onChange={(e) => setSelectedQty(Number(e.target.value))}
+                                value={selectedType?.id}
+                                onChange={(e) => {
+                                    const type = item.donation_types.find(t => t.id === parseInt(e.target.value));
+                                    setSelectedType(type);
+                                }}
                             >
-                                {item.quantities.map(q => <option key={q} value={q}>{q} Adet</option>)}
+                                {item.donation_types
+                                    .slice()
+                                    .sort((a, b) => (a.price || 0) - (b.price || 0))
+                                    .map(type => (
+                                        <option key={type.id} value={type.id}>
+                                            {/* Sadece Varyant Adı (Fiyat kaldırıldı) */}
+                                            {type.name}
+                                        </option>
+                                    ))}
                             </select>
                         </div>
                     )}
 
-                    {/* Custom Amount Input for Variable/Min Price Items */}
-                    {(item.min || !item.price) && (
+                    {/* Flexible Price Input */}
+                    {!isFixed && !hasVariants && (
                         <div>
                             <label className="text-xs font-semibold text-gray-500 uppercase">Bağış Tutarı (₺)</label>
                             <div className="relative mt-1">
                                 <input
                                     type="number"
-                                    min={item.price}
-                                    placeholder={`Min ${item.price} ₺`}
+                                    min={item.min_price}
+                                    placeholder={`Min ${item.min_price} ₺`}
                                     className="w-full p-2 pl-3 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-[#12985a] outline-none"
                                     value={amount}
                                     onChange={(e) => setAmount(e.target.value)}
@@ -289,12 +414,14 @@ function DonationCard({ item }) {
                         </div>
                     )}
 
+                    {/* Footer: Price & Button */}
                     <div className="pt-2 flex items-center justify-between gap-4">
-                        <div className="font-bold text-[#103e6a] text-xl">
-                            {!item.min && item.price
-                                ? <span>{new Intl.NumberFormat('tr-TR').format(item.price * (item.quantities ? selectedQty : 1))} ₺</span>
-                                : null
-                            }
+                        <div className="font-bold text-[#103e6a] text-xl whitespace-nowrap">
+                            {!isFixed && !hasVariants ? (
+                                amount ? <span>{new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(amount)} ₺</span> : <span>Min: {item.min_price} ₺</span>
+                            ) : (
+                                <span>{new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(currentPrice)} ₺</span>
+                            )}
                         </div>
                         <button
                             onClick={handleAddToCart}

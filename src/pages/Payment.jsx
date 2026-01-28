@@ -2,15 +2,22 @@ import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
 import Modal from '../components/Modal';
+import { testCheckout } from '../services/api';
+import { useRef } from 'react';
 
 export default function Payment() {
     const { cartItems, cartTotal, clearCart } = useCart();
     const { user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const showToast = useToast();
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [orderNumber, setOrderNumber] = useState(null); // Sipariş no gösterimi için
+    const [turnstileToken, setTurnstileToken] = useState(null);
+    const turnstileRef = useRef(null);
 
     // Modal States
     const [showMembershipModal, setShowMembershipModal] = useState(false);
@@ -39,12 +46,45 @@ export default function Payment() {
         if (isAuthenticated && user) {
             setFormData(prev => ({
                 ...prev,
-                name: user.name || '',
+                name: user.first_name ? `${user.first_name} ${user.last_name}` : (user.name || ''),
                 email: user.email || '',
-                phone: user.phone || ''
+                phone: user.phone_number || user.phone || ''
             }));
         }
     }, [isAuthenticated, user]);
+
+    // Turnstile token listener
+    useEffect(() => {
+        const handleToken = (e) => {
+            setTurnstileToken(e.detail);
+        };
+        window.addEventListener('turnstileToken', handleToken);
+
+        // Debug: Check site key
+        console.log('🔑 Turnstile Site Key:', import.meta.env.VITE_TURNSTILE_SITE_KEY);
+
+        // Manually trigger render if script is already loaded
+        const observer = new MutationObserver(() => {
+            if (window.turnstile && turnstileRef.current && turnstileRef.current.childNodes.length === 0) {
+                try {
+                    console.log('🔄 Manually rendering Turnstile');
+                    window.turnstile.render(turnstileRef.current, {
+                        sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAAxxxxxxxxxx",
+                        callback: 'onTurnstileSuccess',
+                    });
+                } catch (e) {
+                    console.error('Turnstile render error:', e);
+                }
+            }
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        return () => {
+            window.removeEventListener('turnstileToken', handleToken);
+            observer.disconnect();
+        };
+    }, []);
 
     // Redirect if cart is empty
     useEffect(() => {
@@ -79,22 +119,84 @@ export default function Payment() {
         setFormData(prev => ({ ...prev, expiry: value }));
     };
 
-    const handlePayment = (e) => {
+    const handlePayment = async (e) => {
         e.preventDefault();
 
         if (!formData.agreementsAccepted) {
-            alert('Lütfen Üyelik Sözleşmesi ve Kişisel Veri Rıza Metnini onaylayın.');
+            showToast('Lütfen Üyelik Sözleşmesi ve Kişisel Veri Rıza Metnini onaylayın.', 'error');
+            return;
+        }
+
+        if (!turnstileToken) {
+            showToast('Lütfen güvenlik doğrulamasını tamamlayın.', 'error');
             return;
         }
 
         setLoading(true);
 
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            // Backend'in beklediği format
+            const checkoutData = {
+                items: cartItems.map(item => {
+                    // Backend'den gelen yapı: item.donation_submission.donation bir obje olabilir
+                    let donationId = item.donation_submission?.donation;
+
+                    // Eğer obje ise id'sini al
+                    if (donationId && typeof donationId === 'object') {
+                        donationId = donationId.id;
+                    }
+
+                    // Fallback'ler
+                    if (!donationId) {
+                        donationId = item.donation?.id || item.id;
+                    }
+
+                    return {
+                        donation_id: donationId,
+                        price: item.unit_amount || item.amount || 0,
+                        quantity: item.quantity,
+                        name: item.donation_title || item.donation?.title || item.name,
+                        type: item.item_type || 'donation',
+                        selected_country: item.selected_country, // Yeni alan
+                        donation_type: item.donation_type, // Yeni alan
+                        form_data: item.form_data || {}
+                    };
+                }),
+                contact_info: {
+                    first_name: formData.name.split(' ')[0] || formData.name, // Ad
+                    last_name: formData.name.split(' ').slice(1).join(' ') || '.', // Soyad (basit parse)
+                    email: formData.email,
+                    phone: formData.phone,
+                    address: formData.address,
+                    city: formData.city,
+                    postal_code: '00000', // Frontend formda yoksa default
+                    donate_on_behalf: formData.isOnBehalf,
+                    behalf_person_name: formData.onBehalfOfName,
+                    notes: formData.note
+                },
+                payment_method: 'test_skip', // Test modu için
+                cf_turnstile_response: turnstileToken
+            };
+
+            const response = await testCheckout(checkoutData);
+
+            if (response.success) {
+                setSuccess(true);
+                setOrderNumber(response.order_number);
+                await clearCart(); // API üzerinden sepeti temizle
+                showToast('Bağışınız başarıyla alındı. Teşekkür ederiz!', 'success');
+            } else {
+                showToast('Ödeme işleminde bir sorun oluştu: ' + (response.error || 'Bilinmeyen hata'), 'error');
+                // Reset turnstile on failure
+                if (window.turnstile) window.turnstile.reset();
+            }
+
+        } catch (error) {
+            console.error("Ödeme hatası:", error);
+            showToast('Ödeme işleminde bir hata oluştu: ' + (error.response?.data?.error || error.message), 'error');
+        } finally {
             setLoading(false);
-            setSuccess(true);
-            clearCart();
-        }, 2000);
+        }
     };
 
     if (success) {
@@ -107,6 +209,12 @@ export default function Payment() {
                         </svg>
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">Ödeme Başarılı!</h2>
+                    {orderNumber && (
+                        <div className="bg-gray-50 rounded-lg p-3 mb-4 inline-block">
+                            <span className="text-gray-500 text-sm">Sipariş No:</span>
+                            <span className="text-[#103e6a] font-bold ml-2 text-lg">{orderNumber}</span>
+                        </div>
+                    )}
                     <p className="text-gray-600 mb-8">
                         Bağışınız için teşekkür ederiz. Makbuzunuz e-posta adresinize gönderilecektir.
                     </p>
@@ -334,21 +442,27 @@ export default function Payment() {
                             <h2 className="text-xl font-bold text-gray-900 mb-6">Sipariş Özeti</h2>
 
                             <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
-                                {cartItems.map((item, index) => (
-                                    <div key={index} className="flex gap-3 text-sm">
-                                        {item.image && (
-                                            <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-md" />
-                                        )}
-                                        <div className="flex-1">
-                                            <p className="font-medium text-gray-900 line-clamp-2">{item.name}</p>
-                                            {item.selectedOption && <p className="text-gray-500 text-xs">{item.selectedOption}</p>}
-                                            <div className="flex justify-between mt-1 text-xs text-gray-600">
-                                                <span>{item.quantity} Adet</span>
-                                                <span className="font-bold">{new Intl.NumberFormat('tr-TR').format(item.price * item.quantity)} ₺</span>
+                                {cartItems.map((item, index) => {
+                                    const donationImage = item.donation?.image || item.donation_image || item.cin_ali_item?.image;
+                                    const donationTitle = item.donation?.title || item.donation_title || item.cin_ali_item?.name;
+                                    const unitPrice = item.unit_amount || item.amount || 0;
+
+                                    return (
+                                        <div key={index} className="flex gap-3 text-sm">
+                                            {donationImage && (
+                                                <img src={donationImage} alt={donationTitle} className="w-12 h-12 object-cover rounded-md" />
+                                            )}
+                                            <div className="flex-1">
+                                                <p className="font-medium text-gray-900 line-clamp-2">{donationTitle}</p>
+                                                {item.form_data?.selected_country && <p className="text-gray-500 text-xs">{item.form_data.selected_country}</p>}
+                                                <div className="flex justify-between mt-1 text-xs text-gray-600">
+                                                    <span>{item.quantity} Adet</span>
+                                                    <span className="font-bold">{new Intl.NumberFormat('tr-TR').format(unitPrice * item.quantity)} ₺</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             <div className="border-t border-gray-100 pt-4 mb-6 space-y-2">
@@ -386,6 +500,21 @@ export default function Payment() {
                                         'ni okudum ve kabul ediyorum.
                                     </span>
                                 </label>
+                            </div>
+
+                            {/* Cloudflare Turnstile */}
+                            <div className="mb-6">
+                                <p className="text-xs text-gray-400 text-center mb-2">Güvenlik Doğrulaması</p>
+                                <div className="flex justify-center min-h-[65px] border border-dashed border-gray-200 rounded-lg p-2 bg-gray-50/50">
+                                    <div
+                                        ref={turnstileRef}
+                                        className="cf-turnstile"
+                                        data-sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAAxxxxxxxxxx"}
+                                        data-callback="onTurnstileSuccess"
+                                    >
+                                        <span className="text-xs text-gray-400">Yükleniyor...</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <button
@@ -445,3 +574,9 @@ export default function Payment() {
         </div>
     );
 }
+
+// Global callback for Turnstile
+window.onTurnstileSuccess = function (token) {
+    const event = new CustomEvent('turnstileToken', { detail: token });
+    window.dispatchEvent(event);
+};

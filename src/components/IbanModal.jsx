@@ -1,6 +1,8 @@
 import React from 'react';
+import { useToast } from '../context/ToastContext';
 
 export default function IbanModal({ isOpen, onClose }) {
+    const showToast = useToast();
     if (!isOpen) return null;
 
     const bankDetails = {
@@ -12,13 +14,13 @@ export default function IbanModal({ isOpen, onClose }) {
 
     const handleCopy = (text, label) => {
         navigator.clipboard.writeText(text);
-        alert(`${label} kopyalandı!`);
+        showToast(`${label} kopyalandı!`, 'success');
     };
 
     const handleCopyAll = () => {
         const allText = `Hesap Adı: ${bankDetails.accountName}\nBanka: ${bankDetails.bank}\nIBAN: ${bankDetails.iban}\nNot: ${bankDetails.note}`;
         navigator.clipboard.writeText(allText);
-        alert("Tüm bilgiler kopyalandı!");
+        showToast("Tüm bilgiler kopyalandı!", 'success');
     };
 
     return (
