@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import * as api from '../services/api';
 import { useToast } from './ToastContext';
 
@@ -131,7 +131,30 @@ export function CartProvider({ children }) {
             console.log('🔍 DEBUG - Item:', item);
             console.log('🔍 DEBUG - Submission Data:', submissionData);
 
-            const submission = await api.createDonationSubmission(submissionData);
+            // 1. Turnstile Token Al (Production'da zorunlu)
+            let turnstileToken = '';
+            if (window.turnstile) {
+                try {
+                    // Turnstile'dan yeni bir token iste
+                    turnstileToken = await new Promise((resolve) => {
+                        const container = document.getElementById('turnstile-container');
+                        window.turnstile.execute(container, {
+                            sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
+                            callback: (token) => resolve(token),
+                            'error-callback': () => resolve(''),
+                        });
+                        // 10 saniye timeout (daha güvenli)
+                        setTimeout(() => resolve(''), 10000);
+                    });
+                } catch (e) {
+                    console.error('Turnstile capture failed:', e);
+                }
+            }
+
+            const submission = await api.createDonationSubmission({
+                ...submissionData,
+                cf_turnstile_response: turnstileToken
+            });
 
             // 2. Sepete Ekle
             const cartItem = await api.addToCart(submission.id);
