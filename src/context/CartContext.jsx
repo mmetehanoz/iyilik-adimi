@@ -131,41 +131,7 @@ export function CartProvider({ children }) {
             console.log('🔍 DEBUG - Item:', item);
             console.log('🔍 DEBUG - Submission Data:', submissionData);
 
-            // 1. Turnstile Token Al (Production'da zorunlu)
-            let turnstileToken = '';
-            if (window.turnstile) {
-                try {
-                    // Turnstile'dan yeni bir token iste
-                    const container = document.getElementById('turnstile-container');
-                    if (container) {
-                        turnstileToken = await new Promise((resolve) => {
-                            // Varsa eski widgetları temizle
-                            window.turnstile.reset(container);
-
-                            window.turnstile.render(container, {
-                                sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
-                                callback: (token) => {
-                                    resolve(token);
-                                },
-                                'error-callback': () => resolve(''),
-                                'expired-callback': () => resolve(''),
-                                appearance: 'always', // Görünmez olsa bile render et
-                                execution: 'execute',
-                            });
-
-                            // 10 saniye timeout
-                            setTimeout(() => resolve(''), 10000);
-                        });
-                    }
-                } catch (e) {
-                    console.error('Turnstile capture failed:', e);
-                }
-            }
-
-            const submission = await api.createDonationSubmission({
-                ...submissionData,
-                cf_turnstile_response: turnstileToken
-            });
+            const submission = await api.createDonationSubmission(submissionData);
 
             // 2. Sepete Ekle
             const cartItem = await api.addToCart(submission.id);

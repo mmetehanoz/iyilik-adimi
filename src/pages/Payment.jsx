@@ -67,29 +67,41 @@ export default function Payment() {
             window.dispatchEvent(event);
         };
 
+        let retryCount = 0;
         const renderTurnstile = () => {
-            if (window.turnstile && turnstileRef.current && turnstileRef.current.childNodes.length <= 1) {
+            const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+
+            if (!siteKey) {
+                console.error('❌ Turnstile Site Key is missing!');
+                return;
+            }
+
+            if (window.turnstile && turnstileRef.current) {
                 try {
+                    // Temizle ve yeniden render et
+                    turnstileRef.current.innerHTML = '';
                     window.turnstile.render(turnstileRef.current, {
-                        sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
+                        sitekey: siteKey,
                         callback: 'onTurnstileSuccess',
+                        'error-callback': (err) => console.error('Turnstile widget error:', err),
                     });
+                    console.log('✅ Turnstile rendered successfully');
                 } catch (e) {
                     console.error('Turnstile render error:', e);
+                    if (retryCount < 3) {
+                        retryCount++;
+                        setTimeout(renderTurnstile, 2000);
+                    }
                 }
+            } else if (retryCount < 5) {
+                // Script henüz yüklenmemiş olabilir, tekrar dene
+                retryCount++;
+                setTimeout(renderTurnstile, 1000);
             }
         };
 
-        // Eğer script yüklüyse hemen render et, değilse 1 sn bekle
-        if (window.turnstile) {
-            renderTurnstile();
-        } else {
-            const timer = setTimeout(renderTurnstile, 1500);
-            return () => {
-                clearTimeout(timer);
-                window.removeEventListener('turnstileToken', handleToken);
-            };
-        }
+        // Render işlemini başlat
+        renderTurnstile();
 
         return () => {
             window.removeEventListener('turnstileToken', handleToken);
@@ -530,7 +542,7 @@ export default function Payment() {
                             <button
                                 type="submit"
                                 form="payment-form"
-                                disabled={loading}
+                                disabled={loading || !turnstileToken}
                                 className="w-full py-4 bg-[#103e6a] text-white rounded-xl font-bold hover:bg-[#0d3257] active:scale-[0.98] transition-all shadow-lg shadow-[#103e6a]/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                                 {loading ? (

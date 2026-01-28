@@ -51,8 +51,6 @@ function App() {
 
             <Footer />
             <WhatsAppButton />
-            {/* Hidden Turnstile Container for background verification */}
-            <div id="turnstile-container" style={{ display: 'none' }}></div>
           </div>
         </CartProvider>
       </ToastProvider>
