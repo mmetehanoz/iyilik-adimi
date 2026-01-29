@@ -5,12 +5,12 @@ import 'swiper/css/effect-fade';
 import QuickDonation from './QuickDonation';
 
 const slides = [
-    {
-        id: 1,
-        image: 'https://images.unsplash.com/photo-1509098681029-b45e9c845022?q=80&w=2000&auto=format&fit=crop',
-        title: 'Her Adımda İyilik!',
-        subtitle: 'İYİLİK ADIMI İNSANİ YARDIM DERNEĞİ'
-    },
+    // {
+    //     id: 1,
+    //     image: 'https://images.unsplash.com/photo-1509098681029-b45e9c845022?q=80&w=2000&auto=format&fit=crop',
+    //     title: 'Her Adımda İyilik!',
+    //     subtitle: 'İYİLİK ADIMI İNSANİ YARDIM DERNEĞİ'
+    // },
     {
         id: 2,
         image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2000&auto=format&fit=crop',
