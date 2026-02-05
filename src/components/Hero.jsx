@@ -3,6 +3,7 @@ import { Autoplay, EffectFade } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import QuickDonation from './QuickDonation';
+import slider1 from '../assets/slider/slider-1.webp';
 
 const slides = [
     // {
@@ -13,22 +14,22 @@ const slides = [
     // },
     {
         id: 2,
-        image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2000&auto=format&fit=crop',
+        image: slider1,
         title: 'Umut Ol!',
         subtitle: 'BİR ÇOCUĞUN GÜLÜMSEMESİ DÜNYAYA BEDEL'
     },
-    {
-        id: 3,
-        image: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=2000&auto=format&fit=crop',
-        title: 'Paylaşmak Güzeldir',
-        subtitle: 'İHTİYAÇ SAHİPLERİNE EL UZAT'
-    },
-    {
-        id: 4,
-        image: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=2000&auto=format&fit=crop',
-        title: 'Geleceğe Dokun',
-        subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK'
-    }
+    // {
+    //     id: 3,
+    //     image: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=2000&auto=format&fit=crop',
+    //     title: 'Paylaşmak Güzeldir',
+    //     subtitle: 'İHTİYAÇ SAHİPLERİNE EL UZAT'
+    // },
+    // {
+    //     id: 4,
+    //     image: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=2000&auto=format&fit=crop',
+    //     title: 'Geleceğe Dokun',
+    //     subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK'
+    // }
 ];
 
 export default function Hero() {
