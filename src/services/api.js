@@ -98,6 +98,61 @@ export const getQuickDonationSettings = async () => {
     }
 };
 
+// Cin Ali Öğelerini Getir (Ülkeye göre)
+export const getCinAliItems = async (country = 'african') => {
+    try {
+        const response = await api.get('/cin-ali/items/main/', { params: { country } });
+        return response.data;
+    } catch (error) {
+        console.error("Cin Ali öğeleri yüklenirken hata oluştu:", error);
+        throw error;
+    }
+};
+
+// Haberleri Listele
+export const getNews = async (params) => {
+    try {
+        const response = await api.get('/icerik/haberler/', { params });
+        return response.data;
+    } catch (error) {
+        console.error("Haberler yüklenirken hata oluştu:", error);
+        throw error;
+    }
+};
+
+// Haber Detayı (Slug ile)
+export const getNewsDetail = async (slug) => {
+    try {
+        const response = await api.get(`/icerik/haberler/${slug}/`);
+        return response.data;
+    } catch (error) {
+        console.error("Haber detayı yüklenirken hata oluştu:", error);
+        throw error;
+    }
+};
+
+// Hikaye Detayı (Slug ile)
+export const getStoryDetail = async (slug) => {
+    try {
+        const response = await api.get(`/icerik/hikayeler/${slug}/`);
+        return response.data;
+    } catch (error) {
+        console.error("Hikaye detayı yüklenirken hata oluştu:", error);
+        throw error;
+    }
+};
+
+// Ana Sayfa Verilerini Getir
+export const getHomepageData = async () => {
+    try {
+        const response = await api.get('/icerik/ana-sayfa/');
+        return response.data;
+    } catch (error) {
+        console.error("Ana sayfa verileri yüklenirken hata oluştu:", error);
+        throw error; // Hata fırlat ki çağıran yer handle edebilsin
+    }
+};
+
 // Öne Çıkan Bağışları Getir (is_featured=true ve target_amount var)
 export const getFeaturedDonations = async () => {
     try {
@@ -114,6 +169,27 @@ export const getFeaturedDonations = async () => {
     }
 };
 
+
+// Proje Menüsünü Getir
+export const getProjectMenu = async () => {
+    try {
+        const response = await api.get('/bagislar/proje-menusu/');
+        return response.data;
+    } catch (error) {
+        console.error("Proje menüsü yüklenirken hata oluştu:", error);
+        throw error;
+    }
+};
+
+export const getProjectDetail = async (slug) => {
+    try {
+        const response = await api.get(`/icerik/projeler/${slug}/`);
+        return response.data;
+    } catch (error) {
+        console.error("Proje detayı yüklenirken hata oluştu:", error);
+        throw error;
+    }
+};
 
 // --- Sepet ve Bağış Başvurusu İşlemleri ---
 
@@ -151,6 +227,17 @@ export const addToCart = async (submissionId) => {
         return response.data;
     } catch (error) {
         console.error("Sepete eklenirken hata oluştu:", error);
+        throw error;
+    }
+};
+
+// Cin Ali Sepete Ekle
+export const addCinAliToCart = async (data) => {
+    try {
+        const response = await api.post('/sepet/ekle/', data);
+        return response.data;
+    } catch (error) {
+        console.error("Cin Ali sepete eklenirken hata oluştu:", error);
         throw error;
     }
 };
@@ -213,7 +300,7 @@ export const createBankTransferOrder = async (orderData) => {
 };
 
 // Kredi Kartı (Payfor) ile Ödeme Başlat
-export const payforCheckout = async (checkoutData) => {
+export const paymentCheckout = async (checkoutData) => {
     try {
         const response = await api.post('/sepet/odeme/payfor/', checkoutData);
         return response.data; // { status: 'success', redirect_url: ..., html_content: ... }
@@ -222,6 +309,9 @@ export const payforCheckout = async (checkoutData) => {
         throw error;
     }
 };
+
+// Backward compatibility alias
+export const payforCheckout = paymentCheckout;
 
 // TEST: Ödeme Adımını Atla (Sadece DEBUG modunda çalışır)
 export const testCheckout = async (checkoutData) => {
@@ -389,6 +479,39 @@ export const getRecentActivity = async (limit = 10) => {
     } catch (error) {
         console.error("Son aktiviteler yüklenirken hata oluştu:", error);
         throw error;
+    }
+};
+
+// Harita Verilerini Getir
+export const getGlobalAidMapData = async () => {
+    try {
+        const response = await api.get('/core/map/world-data/');
+        return response.data;
+    } catch (error) {
+        console.error("Harita verileri yüklenirken hata oluştu:", error);
+        throw error;
+    }
+};
+
+// Zekat Kurlarını Getir
+export const getZakatRates = async () => {
+    try {
+        const response = await api.get('/bagislar/zekat-kurlari/');
+        return response.data;
+    } catch (error) {
+        console.error("Zekat kurları yüklenirken hata oluştu:", error);
+        throw error;
+    }
+};
+
+// Global Sistem Ayarlarını Getir (Feature Flags vb.)
+export const getGlobalSettings = async () => {
+    try {
+        const response = await api.get('/core/system-settings/');
+        return response.data;
+    } catch (error) {
+        console.error("Global ayarlar yüklenirken hata oluştu:", error);
+        return { enable_zakat_calculator: false }; // Hata durumunda varsayılan kapalı
     }
 };
 

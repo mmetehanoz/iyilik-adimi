@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
 import Modal from '../components/Modal';
-import { testCheckout } from '../services/api';
-import { useRef } from 'react';
+import { paymentCheckout, testCheckout } from '../services/api';
 
 export default function Payment() {
     const { cartItems, cartTotal, clearCart } = useCart();
@@ -18,6 +17,7 @@ export default function Payment() {
     const [orderNumber, setOrderNumber] = useState(null); // Sipariş no gösterimi için
     const [turnstileToken, setTurnstileToken] = useState(null);
     const turnstileRef = useRef(null);
+    const paymentFormRef = useRef(null); // Banka formu için ref
 
     // Modal States
     const [showMembershipModal, setShowMembershipModal] = useState(false);
@@ -30,16 +30,16 @@ export default function Payment() {
         phone: '',
         address: '',
         city: '',
-        cardNumber: '',
-        expiry: '',
-        cvv: '',
-        cardName: '',
         isAnonymous: false,
         isOnBehalf: false,
         onBehalfOfName: '',
         note: '',
-        agreementsAccepted: false
+        agreementsAccepted: false,
+        paymentProvider: 'vakif' // Default Vakıf Katılım
     });
+
+    // Banka Formu State'i (Otomatik submit için)
+    const [bankForm, setBankForm] = useState(null);
 
     // Pre-fill user data if logged in
     useEffect(() => {
@@ -115,6 +115,14 @@ export default function Payment() {
         }
     }, [cartItems, navigate, success]);
 
+    // Banka formu oluştuğunda otomatik submit et
+    useEffect(() => {
+        if (bankForm && paymentFormRef.current) {
+            console.log("🚀 Banka sayfasına yönlendiriliyor...", bankForm.url);
+            paymentFormRef.current.submit();
+        }
+    }, [bankForm]);
+
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({
@@ -123,22 +131,29 @@ export default function Payment() {
         }));
     };
 
-    const handleCardNumberChange = (e) => {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length > 16) value = value.slice(0, 16);
-        // Format: XXXX XXXX XXXX XXXX
-        const formatted = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-        setFormData(prev => ({ ...prev, cardNumber: formatted }));
-    };
+    const handlePhoneChange = (e) => {
+        let value = e.target.value.replace(/\D/g, ''); // Sadece rakamlar
+        if (value.length > 10) value = value.slice(0, 10); // Max 10 hane
 
-    const handleExpiryChange = (e) => {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length > 4) value = value.slice(0, 4);
-        // Format: MM/YY
-        if (value.length >= 2) {
-            value = value.slice(0, 2) + '/' + value.slice(2);
+        // Aşamalı formatlama
+        if (value.length > 6) {
+            // 5XX XXX XX XX formatı için
+            // İlk 3 hane
+            let formatted = value.slice(0, 3);
+            // Sonraki 3
+            formatted += ' ' + value.slice(3, 6);
+            // Sonraki 2
+            formatted += ' ' + value.slice(6, 8);
+            // Varsa son 2
+            if (value.length > 8) {
+                formatted += ' ' + value.slice(8, 10);
+            }
+            value = formatted;
+        } else if (value.length > 3) {
+            value = value.slice(0, 3) + ' ' + value.slice(3);
         }
-        setFormData(prev => ({ ...prev, expiry: value }));
+
+        setFormData(prev => ({ ...prev, phone: value }));
     };
 
     const handlePayment = async (e) => {
@@ -149,41 +164,23 @@ export default function Payment() {
             return;
         }
 
-        if (!turnstileToken) {
+        // LOCALDE BYPASS:
+        const isLocal = window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1');
+
+        if (!turnstileToken && !isLocal) {
             showToast('Lütfen güvenlik doğrulamasını tamamlayın.', 'error');
             return;
         }
+
+        // Backend'e gönderilecek token (Localde ise dummy)
+        const tokenToSend = isLocal ? 'LOCAL_TEST_TOKEN' : turnstileToken;
 
         setLoading(true);
 
         try {
             // Backend'in beklediği format
             const checkoutData = {
-                items: cartItems.map(item => {
-                    // Backend'den gelen yapı: item.donation_submission.donation bir obje olabilir
-                    let donationId = item.donation_submission?.donation;
-
-                    // Eğer obje ise id'sini al
-                    if (donationId && typeof donationId === 'object') {
-                        donationId = donationId.id;
-                    }
-
-                    // Fallback'ler
-                    if (!donationId) {
-                        donationId = item.donation?.id || item.id;
-                    }
-
-                    return {
-                        donation_id: donationId,
-                        price: item.unit_amount || item.amount || 0,
-                        quantity: item.quantity,
-                        name: item.donation_title || item.donation?.title || item.name,
-                        type: item.item_type || 'donation',
-                        selected_country: item.selected_country, // Yeni alan
-                        donation_type: item.donation_type, // Yeni alan
-                        form_data: item.form_data || {}
-                    };
-                }),
+                // CartItems zaten backend'de mevcut, sadece ekstra bilgileri gönderiyoruz
                 contact_info: {
                     first_name: formData.name.split(' ')[0] || formData.name, // Ad
                     last_name: formData.name.split(' ').slice(1).join(' ') || '.', // Soyad (basit parse)
@@ -196,28 +193,70 @@ export default function Payment() {
                     behalf_person_name: formData.onBehalfOfName,
                     notes: formData.note
                 },
-                payment_method: 'test_skip', // Test modu için
-                cf_turnstile_response: turnstileToken
+                payment_provider: formData.paymentProvider,
+                cf_turnstile_response: tokenToSend
             };
 
-            const response = await testCheckout(checkoutData);
+            // Test ödemesi (sanal pos bypass)
+            if (formData.paymentProvider === 'test') {
+                // Test için items listesi de gönderilmeli
+                checkoutData.items = cartItems.map(item => ({
+                    donation_id: item.donation?.id || item.id,
+                    cin_ali_item_id: item.cin_ali_item?.id || item.cin_ali_item_id,
+                    price: item.unit_amount || item.amount || 0,
+                    quantity: item.quantity,
+                    name: item.donation_title || item.donation?.title || item.name,
+                    type: item.item_type || 'donation',
+                    selected_country: item.selected_country,
+                    donation_type: item.donation_type,
+                    form_data: item.form_data || {}
+                }));
+                checkoutData.payment_method = 'test_skip';
 
-            if (response.success) {
-                setSuccess(true);
-                setOrderNumber(response.order_number);
-                await clearCart(); // API üzerinden sepeti temizle
-                showToast('Bağışınız başarıyla alındı. Teşekkür ederiz!', 'success');
-            } else {
-                showToast('Ödeme işleminde bir sorun oluştu: ' + (response.error || 'Bilinmeyen hata'), 'error');
-                // Reset turnstile on failure
-                if (window.turnstile) window.turnstile.reset();
+                const response = await testCheckout(checkoutData);
+
+                if (response.success) {
+                    setSuccess(true);
+                    setOrderNumber(response.order_number);
+                    await clearCart(); // API üzerinden sepeti temizle
+                    showToast('Bağışınız başarıyla alındı. Teşekkür ederiz!', 'success');
+                } else {
+                    showToast('Ödeme işleminde bir sorun oluştu: ' + (response.error || 'Bilinmeyen hata'), 'error');
+                }
+            }
+            // Gerçek Ödeme Gateway (Vakıf Katılım / Ziraat vb.)
+            else {
+                const response = await paymentCheckout(checkoutData);
+
+                if (response.success) {
+                    // API 'form_data' ve 'gateway_url' dönecek
+                    // Biz de bir form oluşturup submit edeceğiz
+                    if (response.form_data && response.gateway_url) {
+                        setBankForm({
+                            url: response.gateway_url,
+                            fields: response.form_data,
+                            method: 'POST'
+                        });
+                    } else if (response.redirect_url) {
+                        // Direkt redirect (varsa)
+                        window.location.href = response.redirect_url;
+                    } else {
+                        showToast('Ödeme sağlayıcıdan geçersiz yanıt alındı.', 'error');
+                    }
+                } else {
+                    showToast('Ödeme başlatılamadı: ' + (response.error || 'Bilinmeyen hata'), 'error');
+                }
             }
 
         } catch (error) {
             console.error("Ödeme hatası:", error);
             showToast('Ödeme işleminde bir hata oluştu: ' + (error.response?.data?.error || error.message), 'error');
+            // Reset turnstile on failure
+            if (window.turnstile) window.turnstile.reset();
         } finally {
-            setLoading(false);
+            if (!bankForm) { // Eğer banka formuna setlendiyse loading kalmalı (redirect olacak)
+                setLoading(false);
+            }
         }
     };
 
@@ -247,6 +286,28 @@ export default function Payment() {
                         Anasayfaya Dön
                     </button>
                 </div>
+            </div>
+        );
+    }
+
+    // Görünmez Banka Formu Render
+    if (bankForm) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#103e6a] mb-4"></div>
+                <h2 className="text-xl font-bold text-[#103e6a] mb-2">Güvenli Ödeme Sayfasına Yönlendiriliyorsunuz...</h2>
+                <p className="text-gray-600">Lütfen bekleyiniz, banka sayfasına aktarılıyorsunuz.</p>
+
+                <form
+                    ref={paymentFormRef}
+                    action={bankForm.url}
+                    method={bankForm.method || "POST"}
+                    style={{ display: 'none' }}
+                >
+                    {Object.entries(bankForm.fields).map(([key, value]) => (
+                        <input key={key} type="hidden" name={key} value={value} />
+                    ))}
+                </form>
             </div>
         );
     }
@@ -297,9 +358,10 @@ export default function Payment() {
                                         type="tel"
                                         name="phone"
                                         value={formData.phone}
-                                        onChange={handleChange}
+                                        onChange={handlePhoneChange}
                                         className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none transition-all"
-                                        placeholder="(5XX) XXX XX XX"
+                                        placeholder="5XX XXX XX XX"
+                                        maxLength={11}
                                         required
                                     />
                                 </div>
@@ -395,65 +457,73 @@ export default function Payment() {
                         <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                             <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                                 <span className="w-8 h-8 bg-[#103e6a] text-white rounded-full flex items-center justify-center text-sm">3</span>
-                                Ödeme Bilgileri
+                                Ödeme Yöntemi
                             </h2>
+
                             <form id="payment-form" onSubmit={handlePayment} className="space-y-4">
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium text-gray-700">Kart Üzerindeki İsim</label>
-                                    <input
-                                        type="text"
-                                        name="cardName"
-                                        value={formData.cardName}
-                                        onChange={handleChange}
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none transition-all"
-                                        placeholder="Metehan Öztürk"
-                                        required
-                                    />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium text-gray-700">Kart Numarası</label>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            value={formData.cardNumber}
-                                            onChange={handleCardNumberChange}
-                                            className="w-full px-4 py-3 pl-12 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none transition-all font-mono"
-                                            placeholder="0000 0000 0000 0000"
-                                            maxLength={19}
-                                            required
-                                        />
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                        </svg>
+
+                                {/* Payment Provider Selection */}
+                                <div className="space-y-3 mb-4">
+                                    <label className="text-sm font-medium text-gray-700 block mb-2">Banka Seçimi</label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        <label className={`
+                                            cursor-pointer rounded-xl border-2 p-3 flex items-center gap-3 transition-all
+                                            ${formData.paymentProvider === 'vakif' ? 'border-[#103e6a] bg-blue-50' : 'border-gray-100 hover:border-gray-200'}
+                                        `}>
+                                            <input
+                                                type="radio"
+                                                name="paymentProvider"
+                                                value="vakif"
+                                                checked={formData.paymentProvider === 'vakif'}
+                                                onChange={handleChange}
+                                                className="hidden"
+                                            />
+                                            <div className="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center">
+                                                {formData.paymentProvider === 'vakif' && <div className="w-3 h-3 bg-[#103e6a] rounded-full"></div>}
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="font-bold text-[#103e6a]">Vakıf Katılım</div>
+                                                <div className="text-xs text-gray-500">Güvenli Ödeme</div>
+                                            </div>
+                                        </label>
+
+                                        {/* Geliştirme ortamında test seçeneği */}
+                                        {(window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1')) && (
+                                            <label className={`
+                                                cursor-pointer rounded-xl border-2 p-3 flex items-center gap-3 transition-all
+                                                ${formData.paymentProvider === 'test' ? 'border-orange-500 bg-orange-50' : 'border-gray-100 hover:border-gray-200'}
+                                            `}>
+                                                <input
+                                                    type="radio"
+                                                    name="paymentProvider"
+                                                    value="test"
+                                                    checked={formData.paymentProvider === 'test'}
+                                                    onChange={handleChange}
+                                                    className="hidden"
+                                                />
+                                                <div className="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center">
+                                                    {formData.paymentProvider === 'test' && <div className="w-3 h-3 bg-orange-500 rounded-full"></div>}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="font-bold text-orange-700">Test Ödemesi</div>
+                                                    <div className="text-xs text-gray-500">Kartsız Devam Et</div>
+                                                </div>
+                                            </label>
+                                        )}
+                                    </div>
+
+                                    <div className="mt-4 p-4 bg-blue-50 text-[#103e6a] rounded-lg text-sm border border-blue-100">
+                                        <div className="flex items-start gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <p>
+                                                "Ödemeyi Tamamla" butonuna tıkladıktan sonra bankanın <strong>3D Güvenli Ödeme</strong> sayfasına yönlendirileceksiniz. Kart bilgilerinizi o sayfada gireceksiniz.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1">
-                                        <label className="text-sm font-medium text-gray-700">Son Kullanma Tarihi</label>
-                                        <input
-                                            type="text"
-                                            value={formData.expiry}
-                                            onChange={handleExpiryChange}
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none transition-all text-center"
-                                            placeholder="MM/YY"
-                                            maxLength={5}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-sm font-medium text-gray-700">CVV</label>
-                                        <input
-                                            type="text"
-                                            name="cvv"
-                                            value={formData.cvv}
-                                            onChange={handleChange}
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none transition-all text-center"
-                                            placeholder="123"
-                                            maxLength={3}
-                                            required
-                                        />
-                                    </div>
-                                </div>
+
                             </form>
                         </div>
                     </div>
@@ -525,24 +595,27 @@ export default function Payment() {
                             </div>
 
                             {/* Cloudflare Turnstile */}
-                            <div className="mb-6">
-                                <p className="text-xs text-gray-400 text-center mb-2">Güvenlik Doğrulaması</p>
-                                <div className="flex justify-center min-h-[65px] border border-dashed border-gray-200 rounded-lg p-2 bg-gray-50/50">
-                                    <div
-                                        ref={turnstileRef}
-                                        className="cf-turnstile"
-                                        data-sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAAxxxxxxxxxx"}
-                                        data-callback="onTurnstileSuccess"
-                                    >
-                                        <span className="text-xs text-gray-400">Yükleniyor...</span>
+                            {/* LOCALDE KAPALI: Sadece production'da göster */}
+                            {!window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1') && (
+                                <div className="mb-6">
+                                    <p className="text-xs text-gray-400 text-center mb-2">Güvenlik Doğrulaması</p>
+                                    <div className="flex justify-center min-h-[65px] border border-dashed border-gray-200 rounded-lg p-2 bg-gray-50/50">
+                                        <div
+                                            ref={turnstileRef}
+                                            className="cf-turnstile"
+                                            data-sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAAxxxxxxxxxx"}
+                                            data-callback="onTurnstileSuccess"
+                                        >
+                                            <span className="text-xs text-gray-400">Yükleniyor...</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
 
                             <button
                                 type="submit"
                                 form="payment-form"
-                                disabled={loading || !turnstileToken}
+                                disabled={loading || (!turnstileToken && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1'))}
                                 className="w-full py-4 bg-[#103e6a] text-white rounded-xl font-bold hover:bg-[#0d3257] active:scale-[0.98] transition-all shadow-lg shadow-[#103e6a]/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                                 {loading ? (
@@ -596,4 +669,3 @@ export default function Payment() {
         </div>
     );
 }
-

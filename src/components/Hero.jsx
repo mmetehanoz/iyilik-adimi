@@ -4,32 +4,63 @@ import 'swiper/css';
 import 'swiper/css/effect-fade';
 import QuickDonation from './QuickDonation';
 import slider1 from '../assets/slider/slider-1.webp';
+import slider2 from '../assets/slider/s1.webp';
+import slider3 from '../assets/slider/s2.webp';
+import slider4 from '../assets/slider/s3.webp';
+import slider5 from '../assets/slider/s4.webp';
+import slider6 from '../assets/slider/s5.webp';
+import slider7 from '../assets/slider/s6.webp';
+import slider8 from '../assets/slider/s69.webp';
 
 const slides = [
-    // {
-    //     id: 1,
-    //     image: 'https://images.unsplash.com/photo-1509098681029-b45e9c845022?q=80&w=2000&auto=format&fit=crop',
-    //     title: 'Her Adımda İyilik!',
-    //     subtitle: 'İYİLİK ADIMI İNSANİ YARDIM DERNEĞİ'
-    // },
+    {
+        id: 1,
+        image: slider1,
+        title: 'Her Adımda İyilik!',
+        subtitle: 'İYİLİK ADIMI İNSANİ YARDIM DERNEĞİ'
+    },
     {
         id: 2,
-        image: slider1,
+        image: slider2,
         title: 'Umut Ol!',
         subtitle: 'BİR ÇOCUĞUN GÜLÜMSEMESİ DÜNYAYA BEDEL'
     },
-    // {
-    //     id: 3,
-    //     image: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=2000&auto=format&fit=crop',
-    //     title: 'Paylaşmak Güzeldir',
-    //     subtitle: 'İHTİYAÇ SAHİPLERİNE EL UZAT'
-    // },
-    // {
-    //     id: 4,
-    //     image: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=2000&auto=format&fit=crop',
-    //     title: 'Geleceğe Dokun',
-    //     subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK'
-    // }
+    {
+        id: 3,
+        image: slider3,
+        title: 'Paylaşmak Güzeldir',
+        subtitle: 'İHTİYAÇ SAHİPLERİNE EL UZAT'
+    },
+    {
+        id: 4,
+        image: slider4,
+        title: 'Geleceğe Dokun',
+        subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK'
+    },
+    {
+        id: 5,
+        image: slider5,
+        title: 'Geleceğe Dokun',
+        subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK'
+    },
+    {
+        id: 6,
+        image: slider6,
+        title: 'Geleceğe Dokun',
+        subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK'
+    },
+    {
+        id: 7,
+        image: slider7,
+        title: 'Geleceğe Dokun',
+        subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK'
+    },
+    {
+        id: 8,
+        image: slider8,
+        title: 'Geleceğe Dokun',
+        subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK'
+    }
 ];
 
 export default function Hero() {

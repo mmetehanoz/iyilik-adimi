@@ -20,6 +20,11 @@ import Payment from './pages/Payment';
 import ZekatCalculator from './pages/ZekatCalculator';
 import Videos from './pages/Videos';
 import Activation from './pages/Activation';
+import NewsList from './pages/NewsList';
+import NewsDetail from './pages/NewsDetail';
+import StoryDetail from './pages/StoryDetail';
+
+import ProjectDetail from './pages/ProjectDetail';
 
 function App() {
   return (
@@ -46,6 +51,10 @@ function App() {
                 <Route path="/odeme" element={<Payment />} />
                 <Route path="/zekat-hesaplama" element={<ZekatCalculator />} />
                 <Route path="/medya/videolar" element={<Videos />} />
+                <Route path="/medya/haberler" element={<NewsList />} />
+                <Route path="/medya/haberler/:slug" element={<NewsDetail />} />
+                <Route path="/hikayeler/:slug" element={<StoryDetail />} />
+                <Route path="/projeler/:slug" element={<ProjectDetail />} />
               </Routes>
             </main>
 

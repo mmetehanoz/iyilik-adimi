@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
+import { useCart } from '../context/CartContext';
+import { getZakatRates, getDonationDetail, getGlobalSettings, getDonations } from '../services/api';
 
 // --- CONSTANTS ---
 
@@ -140,6 +142,15 @@ const calculateItemValues = (item, rates) => {
 
     // Gold
     if (item.category === 'GOLD') {
+        // Backend'den gelen hazır ürün fiyatlarını kullan (Varsa)
+        if (rates.gold_products && rates.gold_products[item.goldType]) {
+            const pRates = rates.gold_products[item.goldType];
+            buyValue = amount * (parseFloat(pRates.buy) || 0);
+            sellValue = amount * (parseFloat(pRates.sell) || 0);
+            return { buyValue, sellValue };
+        }
+
+        // Yoksa manuel hesapla (Fallback)
         const goldInfo = GOLD_TYPES.find(g => g.id === item.goldType);
         if (goldInfo && rates.GOLD) {
             let totalPureGrams = 0;
@@ -167,7 +178,10 @@ const calculateItemValues = (item, rates) => {
 export default function ZekatCalculator() {
     const [basket, setBasket] = useState([]);
     const [activeCatId, setActiveCatId] = useState('TRY_CASH');
+    const [ratesLoading, setRatesLoading] = useState(true);
+    const navigate = useNavigate();
     const showToast = useToast();
+    const { addToCart } = useCart();
 
     // Form Inputs
     const [amount, setAmount] = useState('');
@@ -182,13 +196,20 @@ export default function ZekatCalculator() {
         GOLD: { buy: '', sell: '' } // Always required for Nisap
     });
 
+    const [zakatDonationId, setZakatDonationId] = useState(null);
+    const [currencyIds, setCurrencyIds] = useState({});
+
     // Determine needed rates based on basket
     const neededRates = useMemo(() => {
-        const needed = new Set(['GOLD']); // Always need gold for Nisap
+        const needed = new Set(['GOLD']); // Nisap için her zaman 24 ayar gram altın gerekli
         basket.forEach(item => {
             if (item.category === 'SILVER') needed.add('SILVER');
             if (item.category === 'FX_CASH') needed.add(item.currency);
-            if (item.currency && item.currency !== 'TL') needed.add(item.currency); // For Trade/Other/Debt
+            if (item.category === 'GOLD' && item.goldType) {
+                // Spesifik altın türünü (çeyrek, yarım...) ekle
+                needed.add(`GOLD_PRODUCT_${item.goldType}`);
+            }
+            if (item.currency && item.currency !== 'TL') needed.add(item.currency); // Ticari/Diğer/Borç için
         });
         return Array.from(needed);
     }, [basket]);
@@ -199,7 +220,14 @@ export default function ZekatCalculator() {
     const handleCalculate = () => {
         // Validate Rates
         const missingRates = neededRates.some(key => {
-            const rate = userRates[key];
+            let rate;
+            if (key.startsWith('GOLD_PRODUCT_')) {
+                const goldTypeId = key.replace('GOLD_PRODUCT_', '');
+                rate = userRates.gold_products?.[goldTypeId];
+            } else {
+                rate = userRates[key];
+            }
+            // Rate must exist and have non-zero buy/sell prices
             return !rate || !rate.buy || !rate.sell;
         });
 
@@ -233,7 +261,8 @@ export default function ZekatCalculator() {
         const netBuy = totalAssetsBuy - totalDebtsBuy;
         const isEligible = netBuy >= nisapThreshold;
         const netSell = totalAssetsSell - totalDebtsSell;
-        const zekatDue = isEligible && netSell > 0 ? netSell * 0.025 : 0;
+        const zekatDueRaw = isEligible && netSell > 0 ? netSell * 0.025 : 0;
+        const zekatDue = Math.round(zekatDueRaw * 100) / 100;
 
         setResults({
             nisapAmount: nisapThreshold,
@@ -251,17 +280,76 @@ export default function ZekatCalculator() {
         }
     };
 
-    // --- EFFECT: Sync needed rates with state ---
-    // Ensure all needed keys exist in userRates so inputs are controlled
+    // --- EFFECT: Fetch Rates ---
     useEffect(() => {
-        setUserRates(prev => {
-            const next = { ...prev };
-            neededRates.forEach(key => {
-                if (!next[key]) next[key] = { buy: '', sell: '' };
-            });
-            return next;
-        });
-    }, [neededRates]);
+        const fetchRates = async () => {
+            try {
+                // Check if module is enabled
+                const settings = await getGlobalSettings();
+                if (!settings?.enable_zakat_calculator) {
+                    showToast("Zekat hesaplama modülü aktif değil.", "warning");
+                    navigate('/');
+                    return;
+                }
+
+                setRatesLoading(true);
+                const data = await getZakatRates();
+                if (!data) return;
+
+                const newRates = {};
+
+                // Currencies
+                if (data.currencies) {
+                    Object.entries(data.currencies).forEach(([code, vals]) => {
+                        newRates[code] = vals;
+                    });
+                }
+                newRates['TL'] = { buy: 1, sell: 1 };
+
+                // Metals
+                if (data.metals) {
+                    if (data.metals.GOLD) newRates['GOLD'] = data.metals.GOLD;
+                    if (data.metals.SILVER) newRates['SILVER'] = data.metals.SILVER;
+                }
+
+                // Gold Products (Backend pre-calculated)
+                if (data.gold_products) {
+                    newRates['gold_products'] = data.gold_products;
+                }
+
+                if (data.currency_ids) {
+                    setCurrencyIds(data.currency_ids);
+                }
+
+                setUserRates(newRates);
+
+                // Try a few possible slugs
+                try {
+                    let d = await getDonationDetail('zekat');
+                    if (d) setZakatDonationId(d.id);
+                } catch (e) {
+                    try {
+                        const donations = await getDonations({ query: 'zekat' });
+                        const zekat = donations.find(d =>
+                            d.slug === 'zekat' ||
+                            d.title.toLowerCase().includes('zekat')
+                        );
+                        if (zekat) setZakatDonationId(zekat.id);
+                    } catch (err2) {
+                        console.log("Zekat donation ID bulunamadı.");
+                    }
+                }
+
+            } catch (err) {
+                console.error(err);
+                showToast("Kurlar güncellenemedi, lütfen daha sonra tekrar deneyin.", "error");
+            } finally {
+                setRatesLoading(false);
+            }
+        };
+
+        fetchRates();
+    }, []);
 
 
     // --- HANDLERS ---
@@ -513,7 +601,7 @@ export default function ZekatCalculator() {
                                 )}
                             </div>
 
-                            {/* Rates Input Section */}
+                            {/* Rates Info Section (Read Only) */}
                             <div className="bg-[#f8fafc] rounded-xl p-5 border border-gray-200">
                                 <h3 className="font-bold text-[#103e6a] mb-4 flex items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -521,57 +609,68 @@ export default function ZekatCalculator() {
                                     </svg>
                                     Güncel Kur Bilgileri
                                 </h3>
-                                <p className="text-xs text-gray-500 mb-4">
-                                    Nisap hesaplaması için <strong>Alış</strong>, zekat hesaplaması için <strong>Satış</strong> fiyatlarını giriniz.
-                                    <br />Altın için <strong>24 Ayar (Has Altın) Gram</strong> fiyatını giriniz.
-                                </p>
 
-                                <div className="grid gap-3">
-                                    {neededRates.map(key => {
-                                        let label = key;
-                                        if (key === 'GOLD') label = '24 Ayar Has Altın (Gram)';
-                                        else if (key === 'SILVER') label = 'Gümüş (Gram)';
-                                        else label = `${key} (Döviz)`;
+                                {ratesLoading ? (
+                                    <div className="text-center py-4 text-gray-500">Kurlar yükleniyor...</div>
+                                ) : (
+                                    <>
+                                        <p className="text-xs text-gray-500 mb-4">
+                                            Kurlar otomatiktir. Nisap için <strong>Alış</strong>, zekat için <strong>Satış</strong> fiyatı baz alınır.
+                                        </p>
 
-                                        return (
-                                            <div key={key} className="flex flex-col md:flex-row md:items-center gap-2 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                                                <span className="font-semibold text-gray-700 text-sm md:w-1/3 break-words">{label}</span>
-                                                <div className="grid grid-cols-2 gap-2 w-full md:w-2/3">
-                                                    <div className="relative">
-                                                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold pointer-events-none">ALIŞ</span>
-                                                        <input
-                                                            type="number"
-                                                            className="w-full pl-10 pr-2 py-3 border rounded-lg text-base focus:border-[#103e6a] outline-none bg-gray-50/50"
-                                                            value={userRates[key]?.buy || ''}
-                                                            onChange={(e) => setUserRates(prev => ({
-                                                                ...prev,
-                                                                [key]: { ...prev[key], buy: e.target.value }
-                                                            }))}
-                                                        />
-                                                    </div>
-                                                    <div className="relative">
-                                                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold pointer-events-none">SATIŞ</span>
-                                                        <input
-                                                            type="number"
-                                                            className="w-full pl-10 pr-2 py-3 border rounded-lg text-base focus:border-[#103e6a] outline-none bg-gray-50/50"
-                                                            value={userRates[key]?.sell || ''}
-                                                            onChange={(e) => setUserRates(prev => ({
-                                                                ...prev,
-                                                                [key]: { ...prev[key], sell: e.target.value }
-                                                            }))}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                <button
-                                    onClick={handleCalculate}
-                                    className="mt-6 w-full py-3 bg-[#12985a] text-white rounded-xl font-bold hover:bg-[#0f8750] transition-colors shadow-lg active:scale-95 transform duration-100"
-                                >
-                                    HESAPLA
-                                </button>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-sm text-left">
+                                                <thead className="text-xs text-gray-500 uppercase bg-gray-50">
+                                                    <tr>
+                                                        <th className="px-3 py-2 rounded-l-lg">Birim</th>
+                                                        <th className="px-3 py-2 text-right">Alış</th>
+                                                        <th className="px-3 py-2 text-right rounded-r-lg">Satış</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {neededRates.filter(k => k !== 'TL').map(key => {
+                                                        let label = key;
+                                                        let rate = userRates[key];
+
+                                                        if (key === 'GOLD') {
+                                                            label = 'Has Altın (24 Ayar Gram)';
+                                                        } else if (key === 'SILVER') {
+                                                            label = 'Gümüş (Gram)';
+                                                        } else if (key.startsWith('GOLD_PRODUCT_')) {
+                                                            const goldTypeId = key.replace('GOLD_PRODUCT_', '');
+                                                            const goldInfo = GOLD_TYPES.find(g => g.id === goldTypeId);
+                                                            label = goldInfo ? goldInfo.label : goldTypeId;
+                                                            // Altın ürünleri userRates.gold_products altında tutuluyor
+                                                            rate = userRates.gold_products?.[goldTypeId];
+                                                        }
+
+                                                        if (!rate) return null;
+
+                                                        return (
+                                                            <tr key={key} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                                                                <td className="px-3 py-2 font-medium text-gray-900">{label}</td>
+                                                                <td className="px-3 py-2 text-right font-mono text-gray-600">
+                                                                    {new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2 }).format(rate.buy)}
+                                                                </td>
+                                                                <td className="px-3 py-2 text-right font-mono text-gray-900 font-bold">
+                                                                    {new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2 }).format(rate.sell)}
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <button
+                                            onClick={handleCalculate}
+                                            disabled={basket.length === 0}
+                                            className="mt-6 w-full py-3 bg-[#12985a] text-white rounded-xl font-bold hover:bg-[#0f8750] transition-colors shadow-lg active:scale-95 transform duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            HESAPLA
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </div>
 
@@ -623,12 +722,49 @@ export default function ZekatCalculator() {
                                                 (Net Varlık Satış Değeri'nin %2.5'i)
                                             </p>
 
-                                            <Link
-                                                to="/bagislar"
-                                                className="block w-full py-3 bg-white text-[#12985a] rounded-xl font-bold hover:bg-green-50 transition-colors"
+                                            <button
+                                                onClick={async () => {
+                                                    if (!zakatDonationId) {
+                                                        showToast("Zekat bağışı bulunamadı. Lütfen yönetici ile iletişime geçin.", "error");
+                                                        return;
+                                                    }
+
+                                                    try {
+                                                        const currencyId = currencyIds['TRY'] || currencyIds['TL'];
+                                                        if (!currencyId) {
+                                                            showToast("Sistem hatası: Para birimi (TRY) bulunamadı.", "error");
+                                                            return;
+                                                        }
+
+                                                        await addToCart({
+                                                            id: zakatDonationId,
+                                                            name: 'Zekat Bağışı',
+                                                            price: results.zekatDue,
+                                                            _submissionData: {
+                                                                donation: zakatDonationId,
+                                                                amount: results.zekatDue,
+                                                                currency: currencyId,
+                                                                anonymous: false,
+                                                                form_data: {
+                                                                    calculation_source: 'Zekat Hesaplama Modülü',
+                                                                    calculation_date: new Date().toISOString(),
+                                                                    calculation_summary: basket.map(item => {
+                                                                        const cat = CATEGORIES.find(c => c.id === item.category);
+                                                                        return `${cat.label}: ${item.amount} ${cat.unit || item.currency || ''}`;
+                                                                    }).join(', ')
+                                                                }
+                                                            }
+                                                        });
+                                                        showToast("Zekat tutarı sepete eklendi.", "success");
+                                                    } catch (error) {
+                                                        console.error(error);
+                                                        showToast("Sepete eklenirken bir hata oluştu.", "error");
+                                                    }
+                                                }}
+                                                className="block w-full py-3 bg-white text-[#12985a] rounded-xl font-bold hover:bg-green-50 transition-colors cursor-pointer"
                                             >
-                                                Zekat Ver
-                                            </Link>
+                                                Sepete Ekle
+                                            </button>
                                         </div>
                                     )}
                                 </div>

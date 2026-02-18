@@ -206,6 +206,7 @@ export function CartProvider({ children }) {
             removeFromCart,
             updateQuantity,
             clearCart,
+            fetchCart,
             cartTotal,
             cartCount,
             isCartOpen,

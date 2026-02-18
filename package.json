@@ -14,10 +14,17 @@
   },
   "dependencies": {
     "axios": "^1.13.2",
+    "d3-geo": "^3.1.1",
+    "d3-scale": "^4.0.2",
+    "framer-motion": "^12.34.0",
+    "prop-types": "^15.8.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.12.0",
-    "swiper": "^12.0.3"
+    "react-simple-maps": "^3.0.0",
+    "react-tooltip": "^5.30.0",
+    "swiper": "^12.0.3",
+    "yet-another-react-lightbox": "^3.29.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
