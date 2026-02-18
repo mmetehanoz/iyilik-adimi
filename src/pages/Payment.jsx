@@ -53,58 +53,53 @@ export default function Payment() {
         }
     }, [isAuthenticated, user]);
 
-    // Turnstile token listener
+    // Turnstile Widget Implementation (Direct Render)
     useEffect(() => {
-        const handleToken = (e) => {
-            console.log('✅ Turnstile Token Received');
-            setTurnstileToken(e.detail);
-        };
-        window.addEventListener('turnstileToken', handleToken);
-
-        // Global callback for the widget
-        window.onTurnstileSuccess = (token) => {
-            const event = new CustomEvent('turnstileToken', { detail: token });
-            window.dispatchEvent(event);
-        };
-
+        let widgetId = null;
         let retryCount = 0;
+
         const renderTurnstile = () => {
-            const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+            const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAACU3BgJDxn-xHO4P";
 
-            if (!siteKey) {
-                console.error('❌ Turnstile Site Key is missing!');
-                return;
-            }
-
+            // Script yüklendi mi ve ref hazır mı?
             if (window.turnstile && turnstileRef.current) {
                 try {
-                    // Temizle ve yeniden render et
-                    turnstileRef.current.innerHTML = '';
-                    window.turnstile.render(turnstileRef.current, {
+                    turnstileRef.current.innerHTML = ''; // Temizle
+
+                    // Render et ve direkt callback fonksiyonu ver
+                    widgetId = window.turnstile.render(turnstileRef.current, {
                         sitekey: siteKey,
-                        callback: 'onTurnstileSuccess',
-                        'error-callback': (err) => console.error('Turnstile widget error:', err),
+                        callback: (token) => {
+                            console.log('✅ Turnstile Başarılı, Token:', token);
+                            setTurnstileToken(token);
+                        },
+                        'expired-callback': () => {
+                            console.warn('⚠️ Turnstile süresi doldu');
+                            setTurnstileToken(null);
+                        },
+                        'error-callback': (err) => {
+                            console.error('❌ Turnstile Hatası:', err);
+                        },
                     });
-                    console.log('✅ Turnstile rendered successfully');
                 } catch (e) {
-                    console.error('Turnstile render error:', e);
-                    if (retryCount < 3) {
-                        retryCount++;
-                        setTimeout(renderTurnstile, 2000);
-                    }
+                    console.error('Turnstile render exception:', e);
                 }
-            } else if (retryCount < 5) {
-                // Script henüz yüklenmemiş olabilir, tekrar dene
+            } else if (retryCount < 20) {
+                // Script yüklenmesini bekle (20 saniye kadar)
                 retryCount++;
                 setTimeout(renderTurnstile, 1000);
             }
         };
 
-        // Render işlemini başlat
         renderTurnstile();
 
+        // Cleanup
         return () => {
-            window.removeEventListener('turnstileToken', handleToken);
+            if (widgetId && window.turnstile) {
+                try {
+                    window.turnstile.remove(widgetId);
+                } catch (e) { }
+            }
         };
     }, []);
 
@@ -600,14 +595,7 @@ export default function Payment() {
                                 <div className="mb-6">
                                     <p className="text-xs text-gray-400 text-center mb-2">Güvenlik Doğrulaması</p>
                                     <div className="flex justify-center min-h-[65px] border border-dashed border-gray-200 rounded-lg p-2 bg-gray-50/50">
-                                        <div
-                                            ref={turnstileRef}
-                                            className="cf-turnstile"
-                                            data-sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAAxxxxxxxxxx"}
-                                            data-callback="onTurnstileSuccess"
-                                        >
-                                            <span className="text-xs text-gray-400">Yükleniyor...</span>
-                                        </div>
+                                        <div ref={turnstileRef}></div>
                                     </div>
                                 </div>
                             )}
