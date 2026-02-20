@@ -23,6 +23,8 @@ import Activation from './pages/Activation';
 import NewsList from './pages/NewsList';
 import NewsDetail from './pages/NewsDetail';
 import StoryDetail from './pages/StoryDetail';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailed from './pages/PaymentFailed';
 
 import ProjectDetail from './pages/ProjectDetail';
 
@@ -49,6 +51,8 @@ function App() {
                 <Route path="/hesap/aktiflestir/basarili" element={<Activation />} />
                 <Route path="/hesap/aktiflestir/hata" element={<Activation />} />
                 <Route path="/odeme" element={<Payment />} />
+                <Route path="/odeme/basarili" element={<PaymentSuccess />} />
+                <Route path="/odeme/basarisiz" element={<PaymentFailed />} />
                 <Route path="/zekat-hesaplama" element={<ZekatCalculator />} />
                 <Route path="/medya/videolar" element={<Videos />} />
                 <Route path="/medya/haberler" element={<NewsList />} />
