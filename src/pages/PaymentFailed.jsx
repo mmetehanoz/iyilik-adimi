@@ -46,15 +46,15 @@ export default function PaymentFailed() {
                     <p className="text-red-600 mt-1 mb-2 font-bold leading-tight">{errorDetails.error}</p>
 
                     {(errorDetails.orderId && errorDetails.orderId !== '0') && (
-                        <div className="text-xs text-gray-400 mt-4 pt-4 border-t border-red-200/50 flex justify-between items-center">
-                            <span>Sipariş / Kayıt No:</span>
-                            <span className="font-mono text-gray-600 bg-white px-2 py-1 rounded shadow-sm">{errorDetails.orderId}</span>
+                        <div className="text-xs text-gray-400 mt-4 pt-4 border-t border-red-200/50 flex justify-between items-start gap-2">
+                            <span className="shrink-0 mt-1">Sipariş / Kayıt No:</span>
+                            <span className="font-mono text-gray-600 bg-white px-2 py-1 rounded shadow-sm break-all text-right">{errorDetails.orderId}</span>
                         </div>
                     )}
                     {errorDetails.errorCode && (
-                        <div className="text-xs text-gray-400 mt-2 flex justify-between items-center">
-                            <span>Banka Hata Kodu:</span>
-                            <span className="font-mono text-gray-600">{errorDetails.errorCode}</span>
+                        <div className="text-xs text-gray-400 mt-2 flex justify-between items-start gap-2">
+                            <span className="shrink-0 mt-1">Banka Hata Kodu:</span>
+                            <span className="font-mono text-gray-600 bg-white px-2 py-1 rounded shadow-sm break-all text-right">{errorDetails.errorCode}</span>
                         </div>
                     )}
                 </div>
