@@ -128,6 +128,12 @@ export default function Payment() {
 
     const handlePhoneChange = (e) => {
         let value = e.target.value.replace(/\D/g, ''); // Sadece rakamlar
+
+        // Eğer 0 ile başlıyorsa 0'ı kaldır (5XX formatı için)
+        if (value.startsWith('0')) {
+            value = value.substring(1);
+        }
+
         if (value.length > 10) value = value.slice(0, 10); // Max 10 hane
 
         // Aşamalı formatlama
@@ -356,7 +362,7 @@ export default function Payment() {
                                         onChange={handlePhoneChange}
                                         className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none transition-all"
                                         placeholder="5XX XXX XX XX"
-                                        maxLength={11}
+                                        maxLength={13}
                                         required
                                     />
                                 </div>
