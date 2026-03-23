@@ -77,7 +77,7 @@ export default function Causes() {
                     <h3 className="text-sm font-bold uppercase tracking-widest text-[#12985a]">
                         PROJELERİMİZ
                     </h3>
-                    <h2 className="mt-2 text-6xl font-black text-gray-700">
+                    <h2 className="mt-2 text-4xl sm:text-6xl font-black text-gray-700">
                         YARDIM <span className="text-[#12985a]">ET!</span>
                     </h2>
                 </div>

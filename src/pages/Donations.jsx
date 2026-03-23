@@ -67,7 +67,7 @@ export default function Donations() {
 
                     return {
                         id: cat.id,
-                        title: cat.name.toUpperCase(),
+                        title: cat.name.toLocaleUpperCase('tr-TR'),
                         icon: getCategoryIcon(cat.name),
                         items: catItems
                     };
@@ -132,6 +132,7 @@ export default function Donations() {
                             slidesPerView={'auto'}
                             spaceBetween={12}
                             freeMode={true}
+                            slidesOffsetAfter={16}
                             autoplay={{
                                 delay: 3000,
                                 disableOnInteraction: false,

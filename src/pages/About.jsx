@@ -24,10 +24,8 @@ export default function About() {
     ];
 
     const documents = [
-        { title: 'Dernek Tüzüğü', date: '2023', size: '1.2 MB' },
-        { title: 'Faaliyet Raporu 2023', date: '2023', size: '4.5 MB' },
-        { title: 'Vergi Muafiyet Belgesi', date: '2015', size: '0.8 MB' },
-        { title: 'Stratejik Plan', date: '2024-2029', size: '2.1 MB' },
+        { title: 'Dernek Tüzüğü', date: '2024', size: '7.1 MB', file: '/tuzuk.pdf' },
+        { title: 'Faaliyet Belgesi', date: '2024', size: '0.5 MB', file: '/faaliyet_belgesi.pdf' },
     ];
 
     return (
@@ -268,9 +266,15 @@ export default function About() {
             <div className="py-20 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4">
                     <h2 className="text-3xl font-bold text-[#103e6a] mb-8 text-center">Resmi Belgelerimiz</h2>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
                         {documents.map((doc, idx) => (
-                            <div key={idx} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-200group cursor-pointer group">
+                            <a
+                                key={idx}
+                                href={doc.file}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-200 cursor-pointer group no-underline"
+                            >
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="p-3 bg-red-50 text-red-500 rounded-lg group-hover:bg-red-500 group-hover:text-white transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -280,8 +284,14 @@ export default function About() {
                                     <span className="text-xs font-mono text-gray-400">{doc.size}</span>
                                 </div>
                                 <h3 className="font-bold text-gray-800 mb-1 group-hover:text-[#103e6a] transition-colors">{doc.title}</h3>
-                                <p className="text-sm text-gray-400">{doc.date}</p>
-                            </div>
+                                <p className="text-sm text-gray-400 mb-3">{doc.date}</p>
+                                <div className="flex items-center gap-1 text-[#12985a] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    PDF Görüntüle
+                                </div>
+                            </a>
                         ))}
                     </div>
                 </div>

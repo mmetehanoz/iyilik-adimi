@@ -33,7 +33,7 @@ function App() {
     <AuthProvider>
       <ToastProvider>
         <CartProvider>
-          <div className="font-sans antialiased text-gray-800">
+          <div className="font-sans antialiased text-gray-800 overflow-x-hidden">
             <ScrollToTop />
             <Header />
             <CartDrawer />

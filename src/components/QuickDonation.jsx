@@ -260,7 +260,7 @@ export default function QuickDonation() {
 
     if (loading) {
         return (
-            <div className="absolute -bottom-10 left-0 right-0 z-20">
+            <div className="md:absolute md:-bottom-10 md:left-0 md:right-0 md:z-20 w-full">
                 <div className="mx-auto max-w-7xl px-4">
                     <div className="rounded-2xl bg-black/70 text-white backdrop-blur p-6 border-2 border-[#12985a]">
                         <div className="flex justify-center">
@@ -278,9 +278,11 @@ export default function QuickDonation() {
     }
 
     return (
-        <div className="absolute -bottom-10 left-0 right-0 z-20">
+        <div className="md:absolute md:-bottom-10 md:left-0 md:right-0 md:z-20 w-full">
             <div className="mx-auto max-w-7xl px-4">
-                <div className="rounded-2xl bg-black/70 text-white backdrop-blur p-6 grid gap-4 md:grid-cols-3 border-2 border-[#12985a] shadow-[0_0_30px_rgba(18,152,90,0.3)]">
+
+                {/* Desktop layout */}
+                <div className="hidden md:grid md:grid-cols-3 gap-4 rounded-2xl bg-black/70 text-white backdrop-blur p-6 border-2 border-[#12985a] shadow-[0_0_30px_rgba(18,152,90,0.3)]">
                     <div>
                         <label className="text-xs uppercase tracking-wide text-white/70">BAĞIŞ TÜRÜ</label>
                         <select
@@ -315,6 +317,59 @@ export default function QuickDonation() {
                         </button>
                     </div>
                 </div>
+
+                {/* Mobile layout */}
+                <div className="md:hidden relative -mt-5 px-4 pb-4">
+                    <div className="rounded-2xl bg-white shadow-lg border border-gray-100 overflow-hidden">
+                        {/* Başlık */}
+                        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100">
+                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#12985a]/10">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-[#12985a]" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            </div>
+                            <span className="text-xs font-bold uppercase tracking-widest text-gray-600">Hızlı Bağış</span>
+                        </div>
+
+                        {/* Form */}
+                        <div className="px-4 pt-3 pb-4">
+                            <div className="grid grid-cols-2 gap-2 mb-3">
+                                <div>
+                                    <label className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">Bağış Türü</label>
+                                    <select
+                                        value={selectedDonation}
+                                        onChange={(e) => setSelectedDonation(e.target.value)}
+                                        className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-[#12985a] focus:border-transparent"
+                                    >
+                                        {settings.available_donations && settings.available_donations.map((donation) => (
+                                            <option key={donation.id} value={donation.id}>
+                                                {donation.title}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-semibold uppercase tracking-widest text-gray-400">Tutar</label>
+                                    <input
+                                        type="text"
+                                        value={amount}
+                                        onChange={handleAmountChange}
+                                        disabled={isAmountDisabled}
+                                        className={`mt-1 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-[#12985a] focus:border-transparent placeholder-gray-400 ${isAmountDisabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                        placeholder={placeholder}
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                onClick={handleDonate}
+                                className="w-full rounded-full bg-[#103e6a] py-2.5 text-sm font-bold text-white transition-all duration-300 animate-heartbeat active:scale-95"
+                            >
+                                BAĞIŞ YAP
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     );

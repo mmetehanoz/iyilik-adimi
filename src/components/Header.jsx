@@ -9,6 +9,11 @@ import { getProjectMenu, getGlobalSettings } from '../services/api';
 export default function Header() {
   const [isIbanModalOpen, setIsIbanModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openSection, setOpenSection] = useState(null);
+
+  const toggleSection = (section) => {
+    setOpenSection(prev => prev === section ? null : section);
+  };
   const { cartCount, toggleCart } = useCart();
   const { isAuthenticated } = useAuth();
   const [projectMenuItems, setProjectMenuItems] = useState([]);
@@ -221,110 +226,162 @@ export default function Header() {
         className={`fixed inset-0 z-40 bg-black/95 backdrop-blur-xl transition-transform duration-300 lg:hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
       >
-        <div className="flex flex-col h-full p-6">
-          <div className="flex justify-end mb-8">
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 shrink-0">
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
+              <img src={logo} alt="İyilik Adımı" className="h-10 w-auto object-contain" />
+            </Link>
             <button
               onClick={() => setIsMobileMenuOpen(false)}
               className="p-2 text-white hover:text-[#12985a] transition-colors"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          <nav className="flex flex-col gap-6 text-xl font-medium text-white text-center">
-            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#12985a]">ANASAYFA</Link>
-            <Link to="/hakkimizda" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#12985a]">HAKKIMIZDA</Link>
+          {/* Scrollable nav area */}
+          <nav className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-1 text-white">
 
-            <div className="py-2 border-y border-white/10 flex flex-col gap-4 text-center">
-              <span className="text-white/60 text-sm font-bold uppercase tracking-wider">PROJELERİMİZ</span>
-              <div className="grid grid-cols-1 gap-3 max-h-[50vh] overflow-y-auto px-4 custom-scrollbar">
-                {projectMenuItems.map((category) => (
-                  <div key={category.id} className="flex flex-col gap-2 bg-white/5 rounded-xl p-3">
-                    <Link
-                      to={menuMode === 'hierarchical' ? `/bagislar?category=${category.id}` : `/projeler/${category.project_slug}`}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-white hover:text-[#12985a] text-base font-bold flex items-center justify-between uppercase"
-                    >
-                      <span>{category.name}</span>
-                      <svg className="w-4 h-4 text-[#12985a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                    </Link>
-                    {menuMode === 'hierarchical' && (
-                      <div className="flex flex-col gap-2 pl-2 border-l border-[#12985a]/30 mt-1 pb-1">
-                        {category.donations?.map((donation) => (
-                          <Link
-                            key={donation.id}
-                            to={donation.project_slug ? `/projeler/${donation.project_slug}` : `/bagislar/${donation.slug}`}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="text-gray-400 hover:text-[#12985a] text-sm text-left flex justify-between items-center"
-                          >
-                            <span className="truncate pr-2">{donation.title}</span>
-                            {donation.price_display && <span className="text-[10px] bg-white/10 px-1.5 py-0.5 rounded shrink-0">{donation.price_display}</span>}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-                <div className="mt-2 pb-4">
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 hover:text-[#12985a] font-bold text-base transition-colors">
+              ANASAYFA
+            </Link>
+            <Link to="/hakkimizda" onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 hover:text-[#12985a] font-bold text-base transition-colors">
+              HAKKIMIZDA
+            </Link>
+
+            {/* PROJELERİMİZ accordion */}
+            <div>
+              <button
+                onClick={() => toggleSection('projects')}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-white/10 font-bold text-base transition-colors"
+              >
+                <span>PROJELERİMİZ</span>
+                <svg className={`w-4 h-4 transition-transform duration-200 ${openSection === 'projects' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {openSection === 'projects' && (
+                <div className="ml-4 mt-1 flex flex-col gap-2 border-l border-white/10 pl-4">
+                  {projectMenuItems.map((category) => (
+                    <div key={category.id}>
+                      <Link
+                        to={menuMode === 'hierarchical' ? `/bagislar?category=${category.id}` : `/projeler/${category.project_slug}`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block py-2 text-sm font-bold text-white/80 hover:text-[#12985a] uppercase transition-colors"
+                      >
+                        {category.name}
+                      </Link>
+                      {menuMode === 'hierarchical' && category.donations?.length > 0 && (
+                        <div className="ml-3 flex flex-col gap-1 border-l border-[#12985a]/30 pl-3 mb-2">
+                          {category.donations.map((donation) => (
+                            <Link
+                              key={donation.id}
+                              to={donation.project_slug ? `/projeler/${donation.project_slug}` : `/bagislar/${donation.slug}`}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="block py-1.5 text-xs text-gray-400 hover:text-[#12985a] transition-colors"
+                            >
+                              {donation.title}
+                              {donation.price_display && (
+                                <span className="ml-2 text-[10px] bg-white/10 px-1.5 py-0.5 rounded">{donation.price_display}</span>
+                              )}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                   <Link
                     to="/bagislar"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="inline-block w-full text-center py-3 border border-[#12985a] text-[#12985a] rounded-xl text-sm font-bold hover:bg-[#12985a] hover:text-white transition-all"
+                    className="block py-2 mb-2 text-center text-sm font-bold text-[#12985a] border border-[#12985a]/40 rounded-lg hover:bg-[#12985a] hover:text-white transition-all"
                   >
                     TÜMÜNÜ GÖR →
                   </Link>
                 </div>
-              </div>
-            </div>
-
-            <div className="py-2 border-y border-white/10 flex flex-col gap-4">
-              <span className="text-white/60 text-sm font-bold uppercase tracking-wider">MEDYA</span>
-              <Link to="/medya/videolar" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-300 hover:text-[#12985a] text-lg">Videolar</Link>
-              <Link to="/medya/haberler" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-300 hover:text-[#12985a] text-lg">Haberler</Link>
-            </div>
-
-            <div className="py-2 border-b border-white/10 flex flex-col gap-4">
-              {zakatEnabled && (
-                <Link to="/zekat-hesaplama" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-300 hover:text-[#12985a] text-lg">Zekat Hesaplama</Link>
               )}
-              <Link to="/rehber/zekat-nedir" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-300 hover:text-[#12985a] text-lg">Zekat Nedir?</Link>
-              <Link to="/rehber/sadaka-nedir" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-300 hover:text-[#12985a] text-lg">Sadaka Nedir?</Link>
             </div>
 
-            <Link to="/iletisim" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#12985a]">İLETİŞİM</Link>
-
-            <div className="mt-4 flex flex-col gap-4">
+            {/* MEDYA accordion */}
+            <div>
               <button
-                onClick={() => {
-                  setIsIbanModalOpen(true);
-                  setIsMobileMenuOpen(false);
-                }}
-                className="w-full rounded-full bg-white py-3 text-[#103e6a] font-bold"
+                onClick={() => toggleSection('medya')}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-white/10 font-bold text-base transition-colors"
               >
-                KOLAY IBAN
+                <span>MEDYA</span>
+                <svg className={`w-4 h-4 transition-transform duration-200 ${openSection === 'medya' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
-
-              {isAuthenticated ? (
-                <Link
-                  to="/hesabim"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full rounded-full bg-white/10 py-3 text-white font-bold"
-                >
-                  HESABIM
-                </Link>
-              ) : (
-                <Link
-                  to="/uyelik"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full rounded-full bg-white/10 py-3 text-white font-bold"
-                >
-                  ÜYE GİRİŞİ
-                </Link>
+              {openSection === 'medya' && (
+                <div className="ml-4 mt-1 flex flex-col gap-1 border-l border-white/10 pl-4 mb-2">
+                  <Link to="/medya/videolar" onClick={() => setIsMobileMenuOpen(false)}
+                    className="block py-2 text-sm text-white/80 hover:text-[#12985a] transition-colors">Videolar</Link>
+                  <Link to="/medya/haberler" onClick={() => setIsMobileMenuOpen(false)}
+                    className="block py-2 text-sm text-white/80 hover:text-[#12985a] transition-colors">Haberler</Link>
+                </div>
               )}
             </div>
+
+            {/* BAĞIŞ REHBERİ accordion */}
+            <div>
+              <button
+                onClick={() => toggleSection('rehber')}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-white/10 font-bold text-base transition-colors"
+              >
+                <span>BAĞIŞ REHBERİ</span>
+                <svg className={`w-4 h-4 transition-transform duration-200 ${openSection === 'rehber' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {openSection === 'rehber' && (
+                <div className="ml-4 mt-1 flex flex-col gap-1 border-l border-white/10 pl-4 mb-2">
+                  {zakatEnabled && (
+                    <Link to="/zekat-hesaplama" onClick={() => setIsMobileMenuOpen(false)}
+                      className="block py-2 text-sm text-white/80 hover:text-[#12985a] transition-colors">Zekat Hesaplama</Link>
+                  )}
+                  <Link to="/rehber/zekat-nedir" onClick={() => setIsMobileMenuOpen(false)}
+                    className="block py-2 text-sm text-white/80 hover:text-[#12985a] transition-colors">Zekat Nedir?</Link>
+                  <Link to="/rehber/sadaka-nedir" onClick={() => setIsMobileMenuOpen(false)}
+                    className="block py-2 text-sm text-white/80 hover:text-[#12985a] transition-colors">Sadaka Nedir?</Link>
+                </div>
+              )}
+            </div>
+
+            <Link to="/iletisim" onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 hover:text-[#12985a] font-bold text-base transition-colors">
+              İLETİŞİM
+            </Link>
           </nav>
+
+          {/* Bottom action buttons */}
+          <div className="px-4 py-4 border-t border-white/10 flex flex-col gap-3 shrink-0">
+            <button
+              onClick={() => { setIsIbanModalOpen(true); setIsMobileMenuOpen(false); }}
+              className="w-full rounded-full bg-white py-3 text-[#103e6a] font-bold text-sm"
+            >
+              KOLAY IBAN
+            </button>
+            {isAuthenticated ? (
+              <Link to="/hesabim" onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full rounded-full bg-white/10 py-3 text-white font-bold text-sm text-center">
+                HESABIM
+              </Link>
+            ) : (
+              <Link to="/uyelik" onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full rounded-full bg-white/10 py-3 text-white font-bold text-sm text-center">
+                ÜYE GİRİŞİ
+              </Link>
+            )}
+            <Link to="/bagislar" onClick={() => setIsMobileMenuOpen(false)}
+              className="w-full rounded-full bg-[#103e6a] py-3 text-white font-bold text-sm text-center">
+              BAĞIŞ YAP
+            </Link>
+          </div>
         </div>
       </div>
 
