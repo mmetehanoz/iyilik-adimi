@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode, Autoplay } from 'swiper/modules';
@@ -31,6 +32,7 @@ export default function Donations() {
     const [activeTab, setActiveTab] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const location = useLocation();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -75,7 +77,12 @@ export default function Donations() {
 
                 setCategories(processedCategories);
                 if (processedCategories.length > 0) {
-                    setActiveTab(processedCategories[0].id);
+                    const params = new URLSearchParams(location.search);
+                    const kategori = params.get('kategori');
+                    const match = kategori
+                        ? processedCategories.find(cat => cat.title.toLowerCase().includes(kategori.toLowerCase()))
+                        : null;
+                    setActiveTab(match ? match.id : processedCategories[0].id);
                 }
 
             } catch (err) {

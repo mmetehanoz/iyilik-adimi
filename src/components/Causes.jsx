@@ -36,6 +36,7 @@ export default function Causes() {
                         ? (parseFloat(donation.raised_amount || 0) / parseFloat(donation.target_amount)) * 100
                         : (donation.share_progress || 0),
                     image: donation.image || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80',
+                    donationCount: donation.donation_count || 0,
                 }));
 
                 setCauses(formattedCauses);
@@ -77,7 +78,7 @@ export default function Causes() {
                     <h3 className="text-sm font-bold uppercase tracking-widest text-[#12985a]">
                         PROJELERİMİZ
                     </h3>
-                    <h2 className="mt-2 text-4xl sm:text-6xl font-black text-gray-700">
+                    <h2 className="mt-2 text-4xl sm:text-6xl font-black text-[#103e6a]">
                         YARDIM <span className="text-[#12985a]">ET!</span>
                     </h2>
                 </div>
@@ -147,7 +148,7 @@ export default function Causes() {
 
                                     {(cause.goal > 0 || cause.percentage > 0) && (
                                         <div className="mt-8">
-                                            <div className="relative h-1 w-full bg-gray-100">
+                                            <div className="relative h-2 w-full bg-gray-100">
                                                 <div
                                                     className={`absolute left-0 top-0 h-full ${colorClasses.bar}`}
                                                     style={{ width: `${Math.min(cause.percentage || 0, 100)}%` }}
@@ -164,7 +165,7 @@ export default function Causes() {
 
                                     {cause.goal > 0 && (
                                         <div className="mt-4 flex items-center justify-between text-xs font-bold tracking-wider text-gray-500">
-                                            <div>HEDEF : {cause.goal.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ₺</div>
+                                            <div>DESTEKLEYEN : {cause.donationCount} Kişi</div>
                                             <div>TOPLANAN : {cause.raised.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ₺</div>
                                         </div>
                                     )}

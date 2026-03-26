@@ -7,6 +7,7 @@ import Instagram from '../components/Instagram';
 import ImpactMap from '../components/ImpactMap';
 import Videos from '../components/Videos';
 import WhatsAppButton from '../components/WhatsAppButton';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 import LatestNews from '../components/LatestNews';
 import HopeStories from '../components/HopeStories';
 
@@ -24,6 +25,7 @@ export default function Home() {
             <HopeStories />
             <Services />
             <WhatsAppButton />
+            <ScrollToTopButton />
         </>
     );
 }

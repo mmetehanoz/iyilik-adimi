@@ -80,12 +80,12 @@ const gazzeImageMap = {
 };
 
 const tabConfig = [
-    { key: 'african', label: 'Afrika', color: '#12985a' },
     { key: 'gaza', label: 'Gazze', color: '#103e6a' },
+    { key: 'african', label: 'Afrika', color: '#12985a' },
 ];
 
 export default function CinAliDonation() {
-    const [activeTab, setActiveTab] = useState('african');
+    const [activeTab, setActiveTab] = useState('gaza');
     const [quantities, setQuantities] = useState({});
     const [items, setItems] = useState({});
     const [loading, setLoading] = useState(true);

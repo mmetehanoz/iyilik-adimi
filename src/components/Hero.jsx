@@ -51,7 +51,7 @@ export default function Hero() {
                 <div className="absolute inset-0 bg-black/40" />
 
                 {/* Slide text */}
-                <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="absolute inset-0 flex items-start justify-center z-10 pt-45">
                     <div className="w-full px-4 text-center text-white">
                         <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight drop-shadow-lg">
                             {slides[current].title}

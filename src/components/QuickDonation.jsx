@@ -260,9 +260,9 @@ export default function QuickDonation() {
 
     if (loading) {
         return (
-            <div className="md:absolute md:-bottom-10 md:left-0 md:right-0 md:z-20 w-full">
+            <div className="md:absolute md:-bottom-20 md:left-0 md:right-0 md:z-20 w-full">
                 <div className="mx-auto max-w-7xl px-4">
-                    <div className="rounded-2xl bg-black/70 text-white backdrop-blur p-6 border-2 border-[#12985a]">
+                    <div className="rounded-2xl bg-white p-6 border-2 border-[#103e6a]/30 shadow-[0_0_30px_rgba(16,62,106,0.15)]">
                         <div className="flex justify-center">
                             <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
                         </div>
@@ -278,17 +278,17 @@ export default function QuickDonation() {
     }
 
     return (
-        <div className="md:absolute md:-bottom-10 md:left-0 md:right-0 md:z-20 w-full">
+        <div className="md:absolute md:-bottom-20 md:left-0 md:right-0 md:z-20 w-full">
             <div className="mx-auto max-w-7xl px-4">
 
                 {/* Desktop layout */}
-                <div className="hidden md:grid md:grid-cols-3 gap-4 rounded-2xl bg-black/70 text-white backdrop-blur p-6 border-2 border-[#12985a] shadow-[0_0_30px_rgba(18,152,90,0.3)]">
+                <div className="hidden md:grid md:grid-cols-3 gap-4 rounded-2xl bg-white text-[#103e6a] p-6 border-2 border-[#103e6a]/30 shadow-[0_0_30px_rgba(16,62,106,0.15)]">
                     <div>
-                        <label className="text-xs uppercase tracking-wide text-white/70">BAĞIŞ TÜRÜ</label>
+                        <label className="text-xs uppercase tracking-wide text-[#103e6a]/70">BAĞIŞ TÜRÜ</label>
                         <select
                             value={selectedDonation}
                             onChange={(e) => setSelectedDonation(e.target.value)}
-                            className="mt-2 w-full rounded-md bg-white/10 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-[#12985a] [&>option]:text-black"
+                            className="mt-2 w-full rounded-md bg-[#103e6a]/5 border border-[#103e6a]/20 px-4 py-3 text-[#103e6a] outline-none focus:ring-2 focus:ring-[#12985a] [&>option]:text-black"
                         >
                             {settings.available_donations && settings.available_donations.map((donation) => (
                                 <option key={donation.id} value={donation.id}>
@@ -298,13 +298,13 @@ export default function QuickDonation() {
                         </select>
                     </div>
                     <div>
-                        <label className="text-xs uppercase tracking-wide text-white/70">BAĞIŞ TUTARI</label>
+                        <label className="text-xs uppercase tracking-wide text-[#103e6a]/70">BAĞIŞ TUTARI</label>
                         <input
                             type="text"
                             value={amount}
                             onChange={handleAmountChange}
                             disabled={isAmountDisabled}
-                            className={`mt-2 w-full rounded-md bg-white/10 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-[#12985a] placeholder-white/50 ${isAmountDisabled ? 'opacity-70 cursor-not-allowed bg-white/5' : ''}`}
+                            className={`mt-2 w-full rounded-md bg-[#103e6a]/5 border border-[#103e6a]/20 px-4 py-3 text-[#103e6a] outline-none focus:ring-2 focus:ring-[#12985a] placeholder-[#103e6a]/40 ${isAmountDisabled ? 'opacity-70 cursor-not-allowed' : ''}`}
                             placeholder={placeholder}
                         />
                     </div>

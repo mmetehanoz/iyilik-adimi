@@ -29,7 +29,7 @@ export default function Videos() {
                     <h3 className="text-sm font-bold uppercase tracking-widest text-[#12985a]">
                         MEDYA GALERİSİ
                     </h3>
-                    <h2 className="mt-2 text-4xl font-black text-gray-900 sm:text-5xl">
+                    <h2 className="mt-2 text-4xl font-black text-[#103e6a] sm:text-5xl">
                         TANITIM VİDEOLARIMIZ
                     </h2>
                     <div className="mx-auto mt-4 h-1 w-24 bg-[#12985a] rounded-full"></div>

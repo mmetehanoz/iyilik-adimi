@@ -28,7 +28,7 @@ export default function Instagram() {
                         href="https://www.instagram.com/iyilikadimitr/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-2 inline-block text-4xl font-black text-gray-900 transition-colors hover:text-[#12985a] sm:text-5xl"
+                        className="mt-2 inline-block text-4xl font-black text-[#103e6a] transition-colors hover:text-[#12985a] sm:text-5xl"
                     >
                         BİZİ INSTAGRAM'DA TAKİP EDİN!
                     </a>

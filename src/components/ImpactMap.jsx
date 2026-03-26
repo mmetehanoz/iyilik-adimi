@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps';
 import { Tooltip } from 'react-tooltip';
 import { getGlobalAidMapData } from '../services/api';
@@ -232,7 +233,20 @@ export default function ImpactMap() {
                                     )}
                                 </div>
 
-                                <div className="p-3 bg-slate-50 text-[10px] text-center text-gray-400 font-medium border-t border-slate-100">
+                                {/* Donate Button */}
+                                <div className="px-4 pb-4 pt-2">
+                                    <Link
+                                        to={selectedCountry.name.toLowerCase().includes('gazze') || selectedCountry.name.toLowerCase().includes('filistin')
+                                            ? '/bagislar?kategori=gazze'
+                                            : '/bagislar'}
+                                        onClick={() => setSelectedCountry(null)}
+                                        className="block w-full text-center rounded-full bg-[#12985a] py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 hover:scale-105 active:scale-95"
+                                    >
+                                        BAĞIŞ YAP
+                                    </Link>
+                                </div>
+
+                                <div className="px-4 pb-3 text-[10px] text-center text-gray-400 font-medium">
                                     Veriler anlık olarak güncellenmektedir.
                                 </div>
                             </motion.div>

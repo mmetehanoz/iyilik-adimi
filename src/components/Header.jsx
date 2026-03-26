@@ -45,7 +45,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed top-0 inset-x-0 z-30 bg-black/60 backdrop-blur">
+      <header className="fixed top-0 inset-x-0 z-30 bg-black/30 backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between text-white">
           <div className="flex items-center gap-2 shrink-0">
             <Link to="/">

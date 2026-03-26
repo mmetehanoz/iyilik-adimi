@@ -121,15 +121,6 @@ export default function Services() {
                         {/* Right Image */}
                         <div className="relative">
                             <img src={testimonyImg} alt="Çocuğumuz" className="h-[600px] w-full object-cover rounded-lg shadow-xl grayscale transition-all hover:grayscale-0" />
-
-                            <div className="absolute -bottom-8 -right-8 flex h-40 w-40 flex-col items-center justify-center bg-[#fcd34d] p-4 text-center shadow-lg">
-                                <span className="text-5xl font-black text-white">24</span>
-                                <span className="text-xs font-bold uppercase tracking-widest text-white/80">AKTİF PROJE</span>
-                            </div>
-
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-white">
-                                <h4 className="text-sm font-bold uppercase tracking-widest text-white/80">HİKAYELERİMİZ</h4>
-                            </div>
                         </div>
 
                     </div>
