@@ -42,7 +42,9 @@ export function CartProvider({ children }) {
             setLoading(true);
 
             // 0. Duplicate Check (Sepette aynı ürün var mı?)
-            const existingCartItem = cartItems.find(cartItem => {
+            // Kurban hisse submission'ları her zaman benzersizdir (farklı katılımcılar), atla.
+            const isKurban = !!item._submissionData?.requested_shares;
+            const existingCartItem = isKurban ? null : cartItems.find(cartItem => {
                 // ID Kontrolü
                 const cartDonationId = cartItem.donation ? String(cartItem.donation.id) : null;
                 if (!cartDonationId || cartDonationId !== String(item.id)) return false;

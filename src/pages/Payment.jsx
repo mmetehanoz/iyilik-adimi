@@ -8,6 +8,11 @@ import { paymentCheckout, testCheckout } from '../services/api';
 
 export default function Payment() {
     const { cartItems, cartTotal, clearCart } = useCart();
+
+    const hasKurbanItems = cartItems.some(item =>
+        item.donation_category?.toLowerCase().includes('kurban') ||
+        item.form_data?.donation_type?.toLowerCase().includes('kurban')
+    );
     const { user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const showToast = useToast();
@@ -34,6 +39,7 @@ export default function Payment() {
         isOnBehalf: false,
         onBehalfOfName: '',
         note: '',
+        vekaletAccepted: false,
         agreementsAccepted: false,
         paymentProvider: 'vakif' // Default Vakıf Katılım
     });
@@ -165,6 +171,11 @@ export default function Payment() {
             return;
         }
 
+        if (hasKurbanItems && !formData.vekaletAccepted) {
+            showToast('Kurban bağışı için vekâlet onayı zorunludur.', 'error');
+            return;
+        }
+
         // LOCALDE BYPASS:
         const isLocal = window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1');
 
@@ -192,7 +203,8 @@ export default function Payment() {
                     postal_code: '00000', // Frontend formda yoksa default
                     donate_on_behalf: formData.isOnBehalf,
                     behalf_person_name: formData.onBehalfOfName,
-                    notes: formData.note
+                    notes: formData.note,
+                    vekalet_accepted: formData.vekaletAccepted
                 },
                 payment_provider: formData.paymentProvider,
                 cf_turnstile_response: tokenToSend
@@ -437,6 +449,26 @@ export default function Payment() {
                                             className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#103e6a] focus:ring-2 focus:ring-[#103e6a]/20 outline-none transition-all"
                                             placeholder="Ad Soyad"
                                         />
+                                    </div>
+                                )}
+
+                                {hasKurbanItems && (
+                                    <div className="mt-2 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                                        <label className="flex items-start gap-3 cursor-pointer group">
+                                            <div className="relative flex items-center mt-0.5">
+                                                <input
+                                                    type="checkbox"
+                                                    name="vekaletAccepted"
+                                                    checked={formData.vekaletAccepted}
+                                                    onChange={handleChange}
+                                                    className="w-5 h-5 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
+                                                />
+                                            </div>
+                                            <span className="text-sm text-amber-900 leading-snug group-hover:text-amber-950 transition-colors">
+                                                <span className="font-semibold">Kurban Vekâleti: </span>
+                                                Sepetimde bulunan kurban bağışları için kurbanımın usulüne uygun kesilmesi, dağıtılması ve gerekli işlemlerin yapılması konusunda derneğinize <strong>vekâlet veriyorum</strong>.
+                                            </span>
+                                        </label>
                                     </div>
                                 )}
                             </div>

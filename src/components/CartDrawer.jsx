@@ -123,6 +123,22 @@ export default function CartDrawer() {
                                                     {new Intl.NumberFormat('tr-TR').format(item.amount || 0)} ₺
                                                 </p>
                                             </div>
+
+                                            {/* Kurban vekalet sahipleri */}
+                                            {(() => {
+                                                const participants = item.form_data?.participants || item.donation_submission?.form_data?.participants;
+                                                if (!participants?.length) return null;
+                                                return (
+                                                    <div className="mt-2 space-y-0.5">
+                                                        <p className="text-xs font-semibold text-gray-500">Vekalet Sahipleri:</p>
+                                                        {participants.map((p, i) => (
+                                                            <p key={i} className="text-xs text-gray-600 pl-2">
+                                                                {i + 1}. {typeof p === 'object' ? p.name : p}
+                                                            </p>
+                                                        ))}
+                                                    </div>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
                                 );

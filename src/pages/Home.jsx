@@ -10,6 +10,8 @@ import WhatsAppButton from '../components/WhatsAppButton';
 import ScrollToTopButton from '../components/ScrollToTopButton';
 import LatestNews from '../components/LatestNews';
 import HopeStories from '../components/HopeStories';
+import HowToHelpSection from '../components/HowToHelpSection';
+import BlogSection from '../components/BlogSection';
 
 export default function Home() {
     return (
@@ -23,6 +25,8 @@ export default function Home() {
             <ImpactMap />
             <LatestNews />
             <HopeStories />
+            <HowToHelpSection />
+            <BlogSection/>
             <Services />
             <WhatsAppButton />
             <ScrollToTopButton />

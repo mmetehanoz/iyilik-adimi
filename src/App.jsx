@@ -25,6 +25,7 @@ import NewsDetail from './pages/NewsDetail';
 import StoryDetail from './pages/StoryDetail';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailed from './pages/PaymentFailed';
+import DuyurPage from './pages/DuyuPages';
 
 import ProjectDetail from './pages/ProjectDetail';
 
@@ -59,6 +60,7 @@ function App() {
                 <Route path="/medya/haberler/:slug" element={<NewsDetail />} />
                 <Route path="/hikayeler/:slug" element={<StoryDetail />} />
                 <Route path="/projeler/:slug" element={<ProjectDetail />} />
+                <Route path="/duyur" element={<DuyurPage />} />
               </Routes>
             </main>
 
