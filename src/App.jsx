@@ -13,6 +13,7 @@ import Donations from './pages/Donations';
 import About from './pages/About';
 import ZekatGuide from './pages/ZekatGuide';
 import SadakaGuide from './pages/SadakaGuide';
+import KurbanGuide from './pages/KurbanGuide';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
@@ -46,6 +47,7 @@ function App() {
                 <Route path="/hakkimizda" element={<About />} />
                 <Route path="/rehber/zekat-nedir" element={<ZekatGuide />} />
                 <Route path="/rehber/sadaka-nedir" element={<SadakaGuide />} />
+                <Route path="/rehber/kurban-nedir" element={<KurbanGuide />} />
                 <Route path="/iletisim" element={<Contact />} />
                 <Route path="/uyelik" element={<Auth />} />
                 <Route path="/hesabim" element={<Dashboard />} />

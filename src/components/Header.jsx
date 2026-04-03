@@ -146,6 +146,7 @@ export default function Header() {
                 )}
                 <Link to="/rehber/zekat-nedir" className="block px-4 py-2 text-gray-700 hover:bg-[#12985a]/10 hover:text-[#12985a] transition-colors">Zekat Nedir?</Link>
                 <Link to="/rehber/sadaka-nedir" className="block px-4 py-2 text-gray-700 hover:bg-[#12985a]/10 hover:text-[#12985a] transition-colors">Sadaka Nedir?</Link>
+                <Link to="/rehber/kurban-nedir" className="block px-4 py-2 text-gray-700 hover:bg-[#12985a]/10 hover:text-[#12985a] transition-colors">Kurban Nedir?</Link>
               </div>
             </div>
 
@@ -348,6 +349,8 @@ export default function Header() {
                     className="block py-2 text-sm text-white/80 hover:text-[#12985a] transition-colors">Zekat Nedir?</Link>
                   <Link to="/rehber/sadaka-nedir" onClick={() => setIsMobileMenuOpen(false)}
                     className="block py-2 text-sm text-white/80 hover:text-[#12985a] transition-colors">Sadaka Nedir?</Link>
+                  <Link to="/rehber/kurban-nedir" onClick={() => setIsMobileMenuOpen(false)}
+                    className="block py-2 text-sm text-white/80 hover:text-[#12985a] transition-colors">Kurban Nedir?</Link>
                 </div>
               )}
             </div>

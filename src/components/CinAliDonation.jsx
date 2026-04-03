@@ -221,14 +221,14 @@ export default function CinAliDonation() {
                 <div className="text-center mb-8 md:mb-12">
                     <h2 className="text-xl sm:text-2xl md:text-4xl font-bold text-gray-800 mb-2 md:mb-3">
                         {activeTab === 'african'
-                            ? "Merhaba, ben Afrika'dan bir çocuğum."
-                            : "Merhaba, ben Gazze'den bir çocuğum."
+                            ? "Selamlar, Ben İbrahim!"
+                            : "Selamün Aleyküm, Ben Yahya!"
                         }
                     </h2>
                     <p className="text-gray-500 text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed px-2">
                         {activeTab === 'african'
-                            ? "Afrika'da zor şartlarda yaşıyorum. Bana ve benim gibi diğer arkadaşlarıma yapacağınız yardımlar için teşekkürler. İyi ki varsınız."
-                            : "Gazze'de zor şartlar altında yaşamımı sürdürmeye çalışıyorum. Yapacağınız her yardım bizim için umut demek. İyi ki varsınız."
+                            ? "Afrika'nın tozlu yollarında, yüzümdeki tebessümü sizin desteklerinizle koruyorum. Attığınız her İyilik Adımı, burada sadece benim değil, kardeşlerimin de dünyasını güzelleştiriyor. İyi ki varsınız."
+                            : "Gazze'de her şeye rağmen hayata tutunmaya çalışıyorum. Sizlerin duaları ve destekleri, burada bizlere yalnız olmadığımızı hissettiren en büyük güç. Yaralarımızı birlikte sarmaya ne dersiniz?"
                         }
                     </p>
                 </div>

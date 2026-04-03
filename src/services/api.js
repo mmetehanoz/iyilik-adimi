@@ -169,7 +169,6 @@ export const getFeaturedDonations = async () => {
     }
 };
 
-
 // Proje Menüsünü Getir
 export const getProjectMenu = async () => {
     try {
@@ -512,6 +511,17 @@ export const getGlobalSettings = async () => {
     } catch (error) {
         console.error("Global ayarlar yüklenirken hata oluştu:", error);
         return { enable_zakat_calculator: false }; // Hata durumunda varsayılan kapalı
+    }
+};
+
+//Buyukbas kurban doluluk ve fiyat bilgisi
+export const getKurbanAvailability = async (donationId, params = {}) => {
+    try {
+        const response = await api.get(`/takip/kurban/${donationId}/musaitlik/`, {params});
+        return response.data;
+    } catch (error){
+        console.error('Kurban musaitlik hatasi:', error);
+        return {is_kurban_buyukbas: false};
     }
 };
 

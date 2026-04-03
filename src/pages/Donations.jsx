@@ -7,6 +7,7 @@ import 'swiper/css';
 import 'swiper/css/free-mode';
 import { getCategories, getDonations } from '../services/api';
 import { useToast } from '../context/ToastContext';
+import KurbanShareModal from '../components/KurbanShareModal';
 
 // Helper to assign icons based on category name
 const getCategoryIcon = (name) => {
@@ -59,6 +60,8 @@ export default function Donations() {
                         price: parseFloat(d.fixed_price || d.min_price || 0),
                         min_price: parseFloat(d.min_price || 0),
                         is_fixed: d.price_type === 'fixed',
+                        is_shareable: d.is_shareable || false,
+                        max_shares: d.max_shares || 0,
                         image: d.image || PLACEHOLDER_IMAGE,
                         available_countries: d.available_countries || [],
                         donation_types: d.donation_types || [],
@@ -129,7 +132,9 @@ export default function Donations() {
         <div className="min-h-screen bg-gray-50 pt-28 pb-16">
             <div className="mx-auto max-w-7xl px-4">
                 <h1 className="text-3xl md:text-4xl font-bold text-center text-[#103e6a] mb-12">
-                    Bağış Kategorileri
+                    İyiliği Paylaşın;<br />
+                    Bağış Videonuzla<br />
+                    Şeffaflığa Şahitlik Edin! 📲
                 </h1>
 
                 <div className="flex flex-col gap-8">
@@ -216,6 +221,7 @@ function DonationCard({ item }) {
 
     const [amount, setAmount] = useState('');
     const [quantity, setQuantity] = useState(1);
+    const [kurbanModalOpen, setKurbanModalOpen] = useState(false);
     const { addToCart } = useCart();
     const showToast = useToast();
 
@@ -280,10 +286,52 @@ function DonationCard({ item }) {
         currentPrice = amount ? parseFloat(amount) : 0;
     }
 
+    const donationType = selectedType
+        ? selectedType.name
+        : (item.is_fixed ? 'Genel Bağış' : `${item.category_name} ${item.name}`);
+
+    const buildCartItem = (price, shareCount, participants, finalSelectedCountry) => {
+        const submissionData = {
+            donation: item.id,
+            amount: price,
+            currency: (item.currency && typeof item.currency === 'object') ? item.currency.id : item.currency,
+            selected_country: finalSelectedCountry,
+            donation_type: donationType,
+            form_data: {
+                selected_country: finalSelectedCountry,
+                donation_type: donationType,
+            }
+        };
+        if (shareCount) {
+            submissionData.requested_shares = shareCount;
+            submissionData.form_data.requested_shares = shareCount;
+            submissionData.form_data.participants = participants || [];
+        }
+        return {
+            id: item.id,
+            name: item.name,
+            image: item.image,
+            price: price,
+            selectedOption: selectedType ? selectedType.name : (finalSelectedCountry || null),
+            selected_country: finalSelectedCountry || null,
+            donation_type: donationType,
+            _submissionData: submissionData,
+            quantity: hasVariants ? 1 : quantity,
+            currency: item.currency,
+            type: 'donation',
+            slug: item.slug
+        };
+    };
+
     const handleAddToCart = () => {
+        // Kurban hisse bağışı — modalı aç (tek hisseli dahil)
+        if (item.is_shareable) {
+            setKurbanModalOpen(true);
+            return;
+        }
+
         // Validation
         if (!isFixed && !hasVariants) {
-            // Flexible validation
             const min = item.min_price || 0;
             if (!amount || parseFloat(amount) < min) {
                 showToast(`Lütfen minimum ${min} ₺ tutarında bağış giriniz.`, 'error');
@@ -304,43 +352,25 @@ function DonationCard({ item }) {
             finalSelectedCountry = item.available_countries[0];
         }
 
-        const cartItem = {
-            id: item.id,
-            name: item.name,
-            image: item.image,
-            price: currentPrice,
-            selectedOption: selectedType ? selectedType.name : (finalSelectedCountry || null),
-            // Backend için detaylar (Eski yöntem)
-            selected_country: finalSelectedCountry || null,
-            donation_type: selectedType
-                ? selectedType.name
-                : (isFixed ? 'Genel Bağış' : `${item.category_name} ${item.name}`),
-            // Yeni Güvenli Yöntem: _submissionData
-            _submissionData: {
-                donation: item.id,
-                amount: currentPrice,
-                currency: (item.currency && typeof item.currency === 'object') ? item.currency.id : item.currency,
-                selected_country: finalSelectedCountry, // Doğru ülke ismi
-                donation_type: selectedType
-                    ? selectedType.name
-                    : (isFixed ? 'Genel Bağış' : `${item.category_name} ${item.name}`),
-                form_data: {
-                    selected_country: finalSelectedCountry,
-                    donation_type: selectedType
-                        ? selectedType.name
-                        : (isFixed ? 'Genel Bağış' : `${item.category_name} ${item.name}`)
-                }
-            },
-            quantity: hasVariants ? 1 : quantity,
-            currency: item.currency,
-            type: 'donation',
-            slug: item.slug
-        };
+        addToCart(buildCartItem(currentPrice, null, null, finalSelectedCountry));
+    };
 
-        addToCart(cartItem);
+    const handleKurbanConfirm = ({ requested_shares, amount: totalAmount, participants }) => {
+        let finalSelectedCountry = selectedCountry;
+        if (!finalSelectedCountry && item.available_countries && item.available_countries.length > 0) {
+            finalSelectedCountry = item.available_countries[0];
+        }
+
+        addToCart(buildCartItem(totalAmount, requested_shares, participants, finalSelectedCountry));
+        setKurbanModalOpen(false);
+        const msg = requested_shares > 1
+            ? `${requested_shares} hisse kurban bağışı sepete eklendi.`
+            : 'Kurban bağışı sepete eklendi.';
+        showToast(msg, 'success');
     };
 
     return (
+        <>
         <div className="border border-gray-200 rounded-xl overflow-hidden hover:border-[#12985a] hover:shadow-lg transition-all duration-300 bg-white group flex flex-col h-full">
             {/* Image */}
             <div className="h-48 overflow-hidden relative">
@@ -444,5 +474,15 @@ function DonationCard({ item }) {
                 </div>
             </div>
         </div>
+
+        {item.is_shareable && (
+            <KurbanShareModal
+                donation={item}
+                isOpen={kurbanModalOpen}
+                onClose={() => setKurbanModalOpen(false)}
+                onConfirm={handleKurbanConfirm}
+            />
+        )}
+        </>
     );
 }

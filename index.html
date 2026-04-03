@@ -4,12 +4,24 @@
 <head>
   <meta charset="UTF-8" />
 
-  <!-- Favicon – light mode -->
-  <link rel="icon" type="image/png" href="/favicon-light.png" media="(prefers-color-scheme: light)" />
-  <!-- Favicon – dark mode -->
-  <link rel="icon" type="image/png" href="/favicon-dark.png" media="(prefers-color-scheme: dark)" />
+  <!-- Favicon -->
+  <link id="favicon" rel="icon" type="image/png" sizes="64x64" href="/favicon-light.png" />
+  <link rel="shortcut icon" href="/favicon-light.png" />
   <!-- Apple Touch Icon -->
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <!-- Favicon dark/light switcher (Chrome, Firefox, Edge, Windows) -->
+  <script>
+    (function () {
+      function setFavicon(dark) {
+        var el = document.getElementById('favicon');
+        var url = dark ? '/favicon-dark.png' : '/favicon-light.png';
+        if (el) el.href = url;
+      }
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      setFavicon(mq.matches);
+      mq.addEventListener('change', function (e) { setFavicon(e.matches); });
+    })();
+  </script>
 
   <!-- Meta Tags -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
