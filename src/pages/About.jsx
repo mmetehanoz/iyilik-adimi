@@ -24,8 +24,9 @@ export default function About() {
     ];
 
     const documents = [
-        { title: 'Dernek Tüzüğü', date: '2024', size: '7.1 MB', file: '/tuzuk.pdf' },
         { title: 'Faaliyet Belgesi', date: '2024', size: '0.5 MB', file: '/faaliyet_belgesi.pdf' },
+        { title: 'Dernek Sorgulama', date: '2024', size: '0.1 MB', file: '/dernek_sorgulama.pdf' },
+        { title: 'Marka Tescil', date: '2024', size: '14 MB', file: '/marka_tescil.pdf' },
     ];
 
     return (
@@ -266,7 +267,7 @@ export default function About() {
             <div className="py-20 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4">
                     <h2 className="text-3xl font-bold text-[#103e6a] mb-8 text-center">Resmi Belgelerimiz</h2>
-                    <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                    <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                         {documents.map((doc, idx) => (
                             <a
                                 key={idx}
