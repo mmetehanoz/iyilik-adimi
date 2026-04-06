@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getStoryDetail } from '../services/api';
 
@@ -8,6 +8,15 @@ export default function StoryDetail() {
     const [story, setStory] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [lightbox, setLightbox] = useState(null); // { src, alt }
+
+    const closeLightbox = useCallback(() => setLightbox(null), []);
+
+    useEffect(() => {
+        const handleKey = (e) => { if (e.key === 'Escape') closeLightbox(); };
+        if (lightbox) document.addEventListener('keydown', handleKey);
+        return () => document.removeEventListener('keydown', handleKey);
+    }, [lightbox, closeLightbox]);
 
     useEffect(() => {
         const fetchStoryDetail = async () => {
@@ -166,7 +175,8 @@ export default function StoryDetail() {
                             {story.gallery_images.map((img) => (
                                 <div
                                     key={img.id}
-                                    className="rounded-xl overflow-hidden shadow-md group border border-gray-100"
+                                    className="rounded-xl overflow-hidden shadow-md group border border-gray-100 cursor-zoom-in"
+                                    onClick={() => setLightbox({ src: img.image_url, alt: img.caption || 'Galeri görseli' })}
                                 >
                                     <img
                                         src={img.image_url}
@@ -180,6 +190,37 @@ export default function StoryDetail() {
                                     )}
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Lightbox */}
+                {lightbox && (
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+                        onClick={closeLightbox}
+                    >
+                        <div
+                            className="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                onClick={closeLightbox}
+                                className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
+                                aria-label="Kapat"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                            <img
+                                src={lightbox.src}
+                                alt={lightbox.alt}
+                                className="max-h-[80vh] max-w-full rounded-xl shadow-2xl object-contain"
+                            />
+                            {lightbox.alt && lightbox.alt !== 'Galeri görseli' && (
+                                <p className="mt-3 text-white/80 text-sm italic text-center">{lightbox.alt}</p>
+                            )}
                         </div>
                     </div>
                 )}
