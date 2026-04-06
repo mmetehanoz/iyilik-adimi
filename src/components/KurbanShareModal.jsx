@@ -8,12 +8,12 @@ import { getKurbanAvailability } from '../services/api';
  *   isOpen        — boolean
  *   onClose       — () => void
  *   onConfirm     — (shareData) => void
- *     shareData = { requested_shares, amount, participants: string[] }
+ *     shareData = { requested_shares, amount, participants: [{ name, email }] }
  */
 export default function KurbanShareModal({ donation, isOpen, onClose, onConfirm }) {
     const isSingleShare = (donation?.max_shares ?? 1) <= 1;
     const [shareCount, setShareCount]       = useState(isSingleShare ? 1 : 1);
-    const [participants, setParticipants]   = useState([{ name: '', phone: '' }]);
+     const [participants, setParticipants]   = useState([{ name: '', email: '' }]);
     const [availability, setAvailability]   = useState(null);
     const [loading]                          = useState(false);
 
@@ -29,7 +29,7 @@ export default function KurbanShareModal({ donation, isOpen, onClose, onConfirm 
         if (isSingleShare) return;
         setParticipants(prev => {
             const next = Array(shareCount).fill(null).map((_, i) =>
-                prev[i] ?? { name: '', phone: '' }
+                prev[i] ?? { name: '', email: '' }
             );
             return next;
         });
@@ -56,12 +56,22 @@ export default function KurbanShareModal({ donation, isOpen, onClose, onConfirm 
             alert(`Lütfen ${emptyIndex + 1}. hisse için vekalet sahibi adını giriniz.`);
             return;
         }
+
+        const invalidEmailIndex = participants.findIndex(p => {
+            const email = p.email.trim();
+            return !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        });
+        if (invalidEmailIndex !== -1) {
+            alert(`Lütfen ${invalidEmailIndex + 1}. hisse için geçerli bir e-posta adresi giriniz.`);
+            return;
+        }
+
         onConfirm({
             requested_shares: shareCount,
             amount: totalPrice,
             participants: participants.map(p => ({
                 name: p.name.trim(),
-                phone: p.phone.trim(),
+                email: p.email.trim(),
             })),
         });
         onClose();
@@ -142,10 +152,10 @@ export default function KurbanShareModal({ donation, isOpen, onClose, onConfirm 
                                                            focus:outline-none focus:ring-2 focus:ring-[#12985a] focus:border-transparent"
                                             />
                                             <input
-                                                type="tel"
-                                                value={p.phone}
-                                                onChange={e => handleParticipantChange(idx, 'phone', e.target.value)}
-                                                placeholder="Telefon numarası (05xx xxx xx xx)"
+                                                type="email"
+                                                value={p.email}
+                                                onChange={e => handleParticipantChange(idx, 'email', e.target.value)}
+                                                placeholder="E-posta adresi"
                                                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm
                                                            focus:outline-none focus:ring-2 focus:ring-[#12985a] focus:border-transparent"
                                             />
