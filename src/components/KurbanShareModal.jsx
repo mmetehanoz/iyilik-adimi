@@ -10,23 +10,23 @@ import { getKurbanAvailability } from '../services/api';
  *   onConfirm     — (shareData) => void
  *     shareData = { requested_shares, amount, participants: [{ name, email }] }
  */
-export default function KurbanShareModal({ donation, selectedCountry, isOpen, onClose, onConfirm }) {
+export default function KurbanShareModal({ donation, selectedCountry, perSharePrice: propPerSharePrice, isOpen, onClose, onConfirm }) {
     const isSingleShare = (donation?.max_shares ?? 1) <= 1;
     const [shareCount, setShareCount]       = useState(isSingleShare ? 1 : 1);
     const [participants, setParticipants]   = useState([{ name: '', email: '' }]);
     const [availability, setAvailability]   = useState(null);
-    const [loading, setLoading]             = useState(false);
+    const [availLoading, setAvailLoading]   = useState(false);
 
-    // Doluluk bilgisini çek
+    // Doluluk ve para birimi bilgisini çek (fiyat için değil, sadece maks hisse + döviz için)
     useEffect(() => {
         if (isOpen && donation?.id) {
-            setLoading(true);
+            setAvailLoading(true);
             setAvailability(null);
             const params = {};
             if (selectedCountry) params.country = selectedCountry;
             getKurbanAvailability(donation.id, params)
                 .then(setAvailability)
-                .finally(() => setLoading(false));
+                .finally(() => setAvailLoading(false));
         }
     }, [isOpen, donation?.id, selectedCountry]);
 
@@ -44,10 +44,11 @@ export default function KurbanShareModal({ donation, selectedCountry, isOpen, on
     if (!isOpen) return null;
 
     const maxAllowed = availability?.max_available_shares ?? donation?.max_shares ?? 7;
-    const perSharePrice = parseFloat(availability?.per_share_price ?? donation?.price ?? 0) || 0;
+    // Fiyat önceliği: 1) kartın hesapladığı doğru fiyat, 2) API yanıtı, 3) donation.price
+    const perSharePrice = parseFloat(propPerSharePrice || availability?.per_share_price || donation?.price || 0) || 0;
     const totalPrice = parseFloat((shareCount * perSharePrice).toFixed(2));
     const currency = availability?.currency ?? 'TRY';
-    const isPriceReady = !loading && perSharePrice > 0;
+    const isPriceReady = perSharePrice > 0;
 
     const handleParticipantChange = (index, field, value) => {
         setParticipants(prev => {
@@ -213,7 +214,7 @@ export default function KurbanShareModal({ donation, selectedCountry, isOpen, on
                             className="flex-1 py-3 bg-[#12985a] text-white rounded-xl font-semibold
                                        hover:bg-[#0e7d49] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? 'Yükleniyor...' : 'Sepete Ekle'}
+                            {availLoading ? 'Yükleniyor...' : 'Sepete Ekle'}
                         </button>
                     </div>
                 </div>

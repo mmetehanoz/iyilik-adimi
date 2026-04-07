@@ -484,6 +484,7 @@ function DonationCard({ item }) {
             <KurbanShareModal
                 donation={item}
                 selectedCountry={selectedCountry}
+                perSharePrice={currentPrice}
                 isOpen={kurbanModalOpen}
                 onClose={() => setKurbanModalOpen(false)}
                 onConfirm={handleKurbanConfirm}
