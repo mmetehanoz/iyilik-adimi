@@ -5,6 +5,7 @@ import { getProjectDetail } from '../services/api';
 export default function ProjectDetail() {
     const { slug } = useParams();
     const [project, setProject] = useState(null);
+    const [categoryId, setCategoryId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -12,9 +13,16 @@ export default function ProjectDetail() {
         const fetchProjectDetail = async () => {
             try {
                 setLoading(true);
-                const data = await getProjectDetail(slug);
-                setProject(data);
-                document.title = `${data.title} - İyilik Adımı`;
+                const projectData = await getProjectDetail(slug);
+
+                setProject(projectData);
+                document.title = `${projectData.title} - İyilik Adımı`;
+
+                // related_donation_category'den kategori ID'sini al
+                if (projectData.related_donation_category) {
+                    setCategoryId(projectData.related_donation_category);
+                    console.log('✅ Category ID set:', projectData.related_donation_category);
+                }
             } catch (err) {
                 console.error('Proje detayı yüklenirken hata:', err);
                 setError('Proje bulunamadı veya yüklenirken bir hata oluştu.');
@@ -46,6 +54,9 @@ export default function ProjectDetail() {
             </div>
         );
     }
+
+    const donationLink = categoryId ? `/bagislar?category=${categoryId}` : '/bagislar';
+    console.log('✅ Donation Link:', donationLink);
 
     return (
         <div className="bg-white min-h-screen pt-20">
@@ -220,7 +231,7 @@ export default function ProjectDetail() {
                             <h4 className="text-xl font-bold mb-2">Bu Projeye Destek Ol</h4>
                             <p className="text-white/80 text-sm mb-6">İyilik paylaştıkça çoğalır. Siz de bu hayra ortak olabilirsiniz.</p>
                             <Link
-                                to="/bagislar"
+                                to={donationLink}
                                 className="block w-full py-3 bg-[#12985a] hover:bg-[#12985a]/90 text-white rounded-xl font-bold transition-all shadow-lg shadow-[#12985a]/20"
                             >
                                 Hemen Bağış Yap

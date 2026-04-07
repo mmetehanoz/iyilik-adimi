@@ -81,10 +81,28 @@ export default function Donations() {
                 setCategories(processedCategories);
                 if (processedCategories.length > 0) {
                     const params = new URLSearchParams(location.search);
+                    // ID parametresini kontrol et (Header menüden gelmişse)
+                    const categoryId = params.get('category');
+                    // İsim parametresini kontrol et (projektler menüsünden gelmişse)
                     const kategori = params.get('kategori');
-                    const match = kategori
-                        ? processedCategories.find(cat => cat.title.toLowerCase().includes(kategori.toLowerCase()))
-                        : null;
+
+                    console.log('📌 Donations - location.search:', location.search);
+                    console.log('📌 Donations - categoryId param:', categoryId);
+                    console.log('📌 Donations - kategori param:', kategori);
+
+                    let match = null;
+                    if (categoryId) {
+                        match = processedCategories.find(cat => cat.id === parseInt(categoryId));
+                        console.log('📌 ID ile eşleşen kategori:', match);
+                    } else if (kategori) {
+                        // Kategori adını (örn. "Gazze") kategori başlığına (örn. "GAZZE") eşle
+                        match = processedCategories.find(cat =>
+                            cat.title.toLowerCase().includes(kategori.toLowerCase()) ||
+                            kategori.toLowerCase().includes(cat.title.toLowerCase())
+                        );
+                        console.log('📌 İsim ile eşleşen kategori:', match);
+                    }
+                    console.log('📌 setActiveTab:', match ? match.id : processedCategories[0].id);
                     setActiveTab(match ? match.id : processedCategories[0].id);
                 }
 
@@ -97,7 +115,7 @@ export default function Donations() {
         };
 
         fetchData();
-    }, []);
+    }, [location.search]);
 
     if (loading) {
         return (
