@@ -23,6 +23,7 @@ import Videos from './pages/Videos';
 import Activation from './pages/Activation';
 import NewsList from './pages/NewsList';
 import NewsDetail from './pages/NewsDetail';
+import StoryList from './pages/StoryList';
 import StoryDetail from './pages/StoryDetail';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailed from './pages/PaymentFailed';
@@ -60,6 +61,7 @@ function App() {
                 <Route path="/medya/videolar" element={<Videos />} />
                 <Route path="/medya/haberler" element={<NewsList />} />
                 <Route path="/medya/haberler/:slug" element={<NewsDetail />} />
+                <Route path="/medya/hikayeler" element={<StoryList />} />
                 <Route path="/hikayeler/:slug" element={<StoryDetail />} />
                 <Route path="/projeler/:slug" element={<ProjectDetail />} />
                 <Route path="/duyur" element={<DuyurPage />} />

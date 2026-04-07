@@ -8,15 +8,32 @@ export default function StoryDetail() {
     const [story, setStory] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [lightbox, setLightbox] = useState(null); // { src, alt }
+    const [lightboxIndex, setLightboxIndex] = useState(null); // index veya null
 
-    const closeLightbox = useCallback(() => setLightbox(null), []);
+    const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+
+    const goToPrevImage = useCallback(() => {
+        if (lightboxIndex === null || !story?.gallery_images) return;
+        const length = story.gallery_images.length;
+        setLightboxIndex((lightboxIndex - 1 + length) % length);
+    }, [lightboxIndex, story]);
+
+    const goToNextImage = useCallback(() => {
+        if (lightboxIndex === null || !story?.gallery_images) return;
+        const length = story.gallery_images.length;
+        setLightboxIndex((lightboxIndex + 1) % length);
+    }, [lightboxIndex, story]);
 
     useEffect(() => {
-        const handleKey = (e) => { if (e.key === 'Escape') closeLightbox(); };
-        if (lightbox) document.addEventListener('keydown', handleKey);
+        const handleKey = (e) => {
+            if (lightboxIndex === null) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') goToPrevImage();
+            if (e.key === 'ArrowRight') goToNextImage();
+        };
+        if (lightboxIndex !== null) document.addEventListener('keydown', handleKey);
         return () => document.removeEventListener('keydown', handleKey);
-    }, [lightbox, closeLightbox]);
+    }, [lightboxIndex, closeLightbox, goToPrevImage, goToNextImage]);
 
     useEffect(() => {
         const fetchStoryDetail = async () => {
@@ -172,11 +189,11 @@ export default function StoryDetail() {
                             Galeri
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {story.gallery_images.map((img) => (
+                            {story.gallery_images.map((img, index) => (
                                 <div
                                     key={img.id}
                                     className="rounded-xl overflow-hidden shadow-md group border border-gray-100 cursor-zoom-in"
-                                    onClick={() => setLightbox({ src: img.image_url, alt: img.caption || 'Galeri görseli' })}
+                                    onClick={() => setLightboxIndex(index)}
                                 >
                                     <img
                                         src={img.image_url}
@@ -195,7 +212,7 @@ export default function StoryDetail() {
                 )}
 
                 {/* Lightbox */}
-                {lightbox && (
+                {lightboxIndex !== null && story?.gallery_images && story.gallery_images[lightboxIndex] && (
                     <div
                         className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
                         onClick={closeLightbox}
@@ -206,20 +223,55 @@ export default function StoryDetail() {
                         >
                             <button
                                 onClick={closeLightbox}
-                                className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
+                                className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors z-10"
                                 aria-label="Kapat"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
+
+                            {/* Previous button */}
+                            {story.gallery_images.length > 1 && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); goToPrevImage(); }}
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-[#12985a] transition-colors bg-black/40 hover:bg-black/60 rounded-full p-2"
+                                    aria-label="Önceki"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                            )}
+
                             <img
-                                src={lightbox.src}
-                                alt={lightbox.alt}
+                                src={story.gallery_images[lightboxIndex].image_url}
+                                alt={story.gallery_images[lightboxIndex].caption || 'Galeri görseli'}
                                 className="max-h-[80vh] max-w-full rounded-xl shadow-2xl object-contain"
                             />
-                            {lightbox.alt && lightbox.alt !== 'Galeri görseli' && (
-                                <p className="mt-3 text-white/80 text-sm italic text-center">{lightbox.alt}</p>
+
+                            {/* Next button */}
+                            {story.gallery_images.length > 1 && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); goToNextImage(); }}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-[#12985a] transition-colors bg-black/40 hover:bg-black/60 rounded-full p-2"
+                                    aria-label="Sonraki"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            )}
+
+                            {story.gallery_images[lightboxIndex].caption && (
+                                <p className="mt-3 text-white/80 text-sm italic text-center">{story.gallery_images[lightboxIndex].caption}</p>
+                            )}
+
+                            {/* Image counter */}
+                            {story.gallery_images.length > 1 && (
+                                <div className="mt-3 text-white/60 text-xs">
+                                    {lightboxIndex + 1} / {story.gallery_images.length}
+                                </div>
                             )}
                         </div>
                     </div>
@@ -227,11 +279,11 @@ export default function StoryDetail() {
 
                 {/* Share/Navigation */}
                 <div className="mt-12 pt-8 border-t border-gray-100 flex justify-between items-center">
-                    <Link to="/" className="flex items-center gap-2 text-[#103e6a] font-bold hover:text-[#12985a] transition-colors">
+                    <Link to="/medya/hikayeler" className="flex items-center gap-2 text-[#103e6a] font-bold hover:text-[#12985a] transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                        Ana Sayfaya Dön
+                        Tüm Hikayelere Dön
                     </Link>
                 </div>
             </div>

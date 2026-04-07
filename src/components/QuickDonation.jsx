@@ -260,11 +260,11 @@ export default function QuickDonation() {
 
     if (loading) {
         return (
-            <div className="md:absolute md:-bottom-20 md:left-0 md:right-0 md:z-20 w-full">
-                <div className="mx-auto max-w-7xl px-4">
-                    <div className="rounded-2xl bg-white p-6 border-2 border-[#103e6a]/30 shadow-[0_0_30px_rgba(16,62,106,0.15)]">
+            <div className="w-full bg-white border-b border-gray-100 shadow-sm">
+                <div className="mx-auto max-w-7xl px-4 py-6">
+                    <div className="rounded-2xl bg-gray-50 p-6 border border-gray-200">
                         <div className="flex justify-center">
-                            <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-8 h-8 border-4 border-[#12985a] border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     </div>
                 </div>
@@ -278,8 +278,8 @@ export default function QuickDonation() {
     }
 
     return (
-        <div className="md:absolute md:-bottom-20 md:left-0 md:right-0 md:z-20 w-full">
-            <div className="mx-auto max-w-7xl px-4">
+        <div className="w-full bg-white border-b border-gray-100 shadow-sm">
+            <div className="mx-auto max-w-7xl px-4 py-8">
 
                 {/* Desktop layout */}
                 <div className="hidden md:grid md:grid-cols-3 gap-4 rounded-2xl bg-white text-[#103e6a] p-6 border-2 border-[#103e6a]/30 shadow-[0_0_30px_rgba(16,62,106,0.15)]">
@@ -319,7 +319,7 @@ export default function QuickDonation() {
                 </div>
 
                 {/* Mobile layout */}
-                <div className="md:hidden relative -mt-5 px-4 pb-4">
+                <div className="md:hidden px-4 py-4">
                     <div className="rounded-2xl bg-white shadow-lg border border-gray-100 overflow-hidden">
                         {/* Başlık */}
                         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100">

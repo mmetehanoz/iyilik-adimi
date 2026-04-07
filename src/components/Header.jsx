@@ -131,7 +131,7 @@ export default function Header() {
               <div className="absolute top-full left-1/2 -translate-x-1/2 w-48 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top border border-gray-100">
                 <Link to="/medya/videolar" className="block px-4 py-2 text-gray-700 hover:bg-[#12985a]/10 hover:text-[#12985a] transition-colors">Videolar</Link>
                 <Link to="/medya/haberler" className="block px-4 py-2 text-gray-700 hover:bg-[#12985a]/10 hover:text-[#12985a] transition-colors">Haberler</Link>
-                {/* Future media items can go here */}
+                <Link to="/medya/hikayeler" className="block px-4 py-2 text-gray-700 hover:bg-[#12985a]/10 hover:text-[#12985a] transition-colors">Umut Hikayeleri</Link>
               </div>
             </div>
 
@@ -324,6 +324,8 @@ export default function Header() {
                     className="block py-2 text-sm text-white/80 hover:text-[#12985a] transition-colors">Videolar</Link>
                   <Link to="/medya/haberler" onClick={() => setIsMobileMenuOpen(false)}
                     className="block py-2 text-sm text-white/80 hover:text-[#12985a] transition-colors">Haberler</Link>
+                  <Link to="/medya/hikayeler" onClick={() => setIsMobileMenuOpen(false)}
+                    className="block py-2 text-sm text-white/80 hover:text-[#12985a] transition-colors">Umut Hikayeleri</Link>
                 </div>
               )}
             </div>

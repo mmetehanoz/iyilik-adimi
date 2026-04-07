@@ -131,6 +131,17 @@ export const getNewsDetail = async (slug) => {
     }
 };
 
+// Hikayeleri Listele
+export const getStories = async (params) => {
+    try {
+        const response = await api.get('/icerik/hikayeler/', { params });
+        return response.data;
+    } catch (error) {
+        console.error("Hikayeler yüklenirken hata oluştu:", error);
+        throw error;
+    }
+};
+
 // Hikaye Detayı (Slug ile)
 export const getStoryDetail = async (slug) => {
     try {
