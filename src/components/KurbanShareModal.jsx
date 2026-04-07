@@ -13,14 +13,18 @@ import { getKurbanAvailability } from '../services/api';
 export default function KurbanShareModal({ donation, isOpen, onClose, onConfirm }) {
     const isSingleShare = (donation?.max_shares ?? 1) <= 1;
     const [shareCount, setShareCount]       = useState(isSingleShare ? 1 : 1);
-     const [participants, setParticipants]   = useState([{ name: '', email: '' }]);
+    const [participants, setParticipants]   = useState([{ name: '', email: '' }]);
     const [availability, setAvailability]   = useState(null);
-    const [loading]                          = useState(false);
+    const [loading, setLoading]             = useState(false);
 
     // Doluluk bilgisini çek
     useEffect(() => {
         if (isOpen && donation?.id) {
-            getKurbanAvailability(donation.id).then(setAvailability);
+            setLoading(true);
+            setAvailability(null);
+            getKurbanAvailability(donation.id)
+                .then(setAvailability)
+                .finally(() => setLoading(false));
         }
     }, [isOpen, donation?.id]);
 
@@ -38,9 +42,10 @@ export default function KurbanShareModal({ donation, isOpen, onClose, onConfirm 
     if (!isOpen) return null;
 
     const maxAllowed = availability?.max_available_shares ?? donation?.max_shares ?? 7;
-    const perSharePrice = availability?.per_share_price ?? donation?.fixed_price ?? donation?.price ?? 0;
-    const totalPrice = shareCount * perSharePrice;
+    const perSharePrice = parseFloat(availability?.per_share_price ?? donation?.price ?? 0) || 0;
+    const totalPrice = parseFloat((shareCount * perSharePrice).toFixed(2));
     const currency = availability?.currency ?? 'TRY';
+    const isPriceReady = !loading && perSharePrice > 0;
 
     const handleParticipantChange = (index, field, value) => {
         setParticipants(prev => {
@@ -51,6 +56,14 @@ export default function KurbanShareModal({ donation, isOpen, onClose, onConfirm 
     };
 
     const handleConfirm = () => {
+        if (!isPriceReady) {
+            alert('Fiyat bilgisi henüz yüklenmedi. Lütfen bekleyiniz.');
+            return;
+        }
+        if (!totalPrice || totalPrice <= 0) {
+            alert('Geçerli bir tutar hesaplanamadı. Lütfen sayfayı yenileyip tekrar deneyin.');
+            return;
+        }
         const emptyIndex = participants.findIndex(p => !p.name.trim());
         if (emptyIndex !== -1) {
             alert(`Lütfen ${emptyIndex + 1}. hisse için vekalet sahibi adını giriniz.`);
@@ -194,11 +207,11 @@ export default function KurbanShareModal({ donation, isOpen, onClose, onConfirm 
                         </button>
                         <button
                             onClick={handleConfirm}
-                            disabled={loading}
+                            disabled={!isPriceReady}
                             className="flex-1 py-3 bg-[#12985a] text-white rounded-xl font-semibold
-                                       hover:bg-[#0e7d49] transition-colors disabled:opacity-50"
+                                       hover:bg-[#0e7d49] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Sepete Ekle
+                            {loading ? 'Yükleniyor...' : 'Sepete Ekle'}
                         </button>
                     </div>
                 </div>

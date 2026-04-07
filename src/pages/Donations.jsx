@@ -57,7 +57,7 @@ export default function Donations() {
                         name: d.title,
                         category_name: cat.name, // Kategori adı eklendi
                         description: d.short_description || d.description,
-                        price: parseFloat(d.fixed_price || d.min_price || 0),
+                        price: parseFloat(d.fixed_price || d.min_price || (d.is_shareable && d.price_variants?.length > 0 ? d.price_variants[0].price : 0) || 0),
                         min_price: parseFloat(d.min_price || 0),
                         is_fixed: d.price_type === 'fixed',
                         is_shareable: d.is_shareable || false,

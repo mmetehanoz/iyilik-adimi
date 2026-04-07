@@ -517,7 +517,7 @@ export const getGlobalSettings = async () => {
 //Buyukbas kurban doluluk ve fiyat bilgisi
 export const getKurbanAvailability = async (donationId, params = {}) => {
     try {
-        const response = await api.get(`/takip/kurban/${donationId}/musaitlik/`, {params});
+        const response = await api.get(`/paylasim/kurban/${donationId}/musaitlik/`, {params});
         return response.data;
     } catch (error){
         console.error('Kurban musaitlik hatasi:', error);
