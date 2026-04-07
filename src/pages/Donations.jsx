@@ -244,7 +244,7 @@ function DonationCard({ item }) {
             );
         }
 
-        // 2. Bulunamazsa sadece Tip eşleşmesi ara (Ülke bağımsız varyant)
+        // 2. Sadece Tip eşleşmesi (ülkeden bağımsız)
         if (!variant) {
             variant = item.price_variants.find(v =>
                 v.donation_type_id === selectedType.id &&
@@ -252,8 +252,15 @@ function DonationCard({ item }) {
             );
         }
 
+        // 3. Sadece Ülke eşleşmesi (tipten bağımsız)
+        if (!variant && selectedCountry) {
+            variant = item.price_variants.find(v =>
+                v.country === selectedCountry &&
+                !v.donation_type_id
+            );
+        }
+
         if (variant) {
-            // Varyant tablosundan gelen fiyat
             currentPrice = parseFloat(variant.price);
         } else {
             // Hiçbiri yoksa DonationType'ın kendi fiyatı
@@ -266,21 +273,19 @@ function DonationCard({ item }) {
         }
 
     } else if (isFixed) {
-        // Fixed Price - Check for country-specific variant first
+        // Fixed Price: ülkeye özgü varyant ara
+        // donation_type_id null olanı tercih et; bulunamazsa herhangi bir ülke varyantını kullan
         let variant = null;
         if (selectedCountry) {
-            variant = item.price_variants.find(v =>
-                v.country === selectedCountry &&
-                !v.donation_type_id
-            );
+            const countryVariants = item.price_variants.filter(v => v.country === selectedCountry);
+            variant = countryVariants.find(v => !v.donation_type_id) ?? countryVariants[0] ?? null;
         }
-
-        if (variant) {
-            currentPrice = parseFloat(variant.price);
-        } else {
-            // Donation.jsx mapping uses item.price for fixed_price/min_price
-            currentPrice = parseFloat(item.price || 0);
+        // Ülke eşleşmesi yoksa genel (ülkesiz) varyanta bak
+        if (!variant) {
+            const genericVariants = item.price_variants.filter(v => !v.country);
+            variant = genericVariants.find(v => !v.donation_type_id) ?? genericVariants[0] ?? null;
         }
+        currentPrice = variant ? parseFloat(variant.price) : parseFloat(item.price || 0);
     } else {
         // Flexible
         currentPrice = amount ? parseFloat(amount) : 0;
@@ -478,6 +483,7 @@ function DonationCard({ item }) {
         {item.is_shareable && (
             <KurbanShareModal
                 donation={item}
+                selectedCountry={selectedCountry}
                 isOpen={kurbanModalOpen}
                 onClose={() => setKurbanModalOpen(false)}
                 onConfirm={handleKurbanConfirm}

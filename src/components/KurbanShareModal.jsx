@@ -10,7 +10,7 @@ import { getKurbanAvailability } from '../services/api';
  *   onConfirm     — (shareData) => void
  *     shareData = { requested_shares, amount, participants: [{ name, email }] }
  */
-export default function KurbanShareModal({ donation, isOpen, onClose, onConfirm }) {
+export default function KurbanShareModal({ donation, selectedCountry, isOpen, onClose, onConfirm }) {
     const isSingleShare = (donation?.max_shares ?? 1) <= 1;
     const [shareCount, setShareCount]       = useState(isSingleShare ? 1 : 1);
     const [participants, setParticipants]   = useState([{ name: '', email: '' }]);
@@ -22,11 +22,13 @@ export default function KurbanShareModal({ donation, isOpen, onClose, onConfirm 
         if (isOpen && donation?.id) {
             setLoading(true);
             setAvailability(null);
-            getKurbanAvailability(donation.id)
+            const params = {};
+            if (selectedCountry) params.country = selectedCountry;
+            getKurbanAvailability(donation.id, params)
                 .then(setAvailability)
                 .finally(() => setLoading(false));
         }
-    }, [isOpen, donation?.id]);
+    }, [isOpen, donation?.id, selectedCountry]);
 
     // Hisse sayısı değişince participant listesini ayarla (çok hisseli için)
     useEffect(() => {
