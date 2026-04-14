@@ -1,4 +1,5 @@
 import Hero from '../components/Hero';
+import GazzeSection from '../components/GazzeSection';
 import Causes from '../components/Causes';
 import BeforeAfterSlider from '../components/BeforeAfterSlider';
 import CinAliDonation from '../components/CinAliDonation';
@@ -17,6 +18,7 @@ export default function Home() {
     return (
         <>
             <Hero />
+            <GazzeSection />
             <Causes />
             <BeforeAfterSlider />
             <CinAliDonation />

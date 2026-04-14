@@ -6,13 +6,20 @@ export default function About() {
         document.title = 'Hakkımızda - İyilik Adımı';
     }, []);
 
-    const historyEvents = [
-        { year: '1986', title: 'Kuruluş', description: 'İyilik yolculuğumuzun ilk adımları atıldı.' },
-        { year: '1995', title: 'İlk Yurt Dışı Faaliyeti', description: 'Afrika kıtasında ilk insani yardım operasyonu.' },
-        { year: '2005', title: 'Dernekleşme', description: 'Kurumsal yapıya geçerek faaliyet alanlarımızı genişlettik.' },
-        { year: '2015', title: '1 Milyon Kişiye Ulaştık', description: 'Global ölçekte yardımlarımız 1 milyon ihtiyaç sahibine ulaştı.' },
-        { year: '2024', title: 'Geleceğe Umut', description: 'Teknoloji ve insanlığı birleştirerek büyümeye devam ediyoruz.' },
+    const countries = [
+        { name: 'Türkiye', flag: '\ud83c\uddf9\ud83c\uddf7' },
+        { name: 'Gazze', flag: '\ud83c\uddf5\ud83c\uddf8' },
+        { name: 'Yemen', flag: '\ud83c\uddfe\ud83c\uddea' },
+        { name: 'Sudan', flag: '\ud83c\uddf8\ud83c\udde9' },
+        { name: 'Banglade\u015f', flag: '\ud83c\udde7\ud83c\udde9' },
+        { name: 'Afganistan', flag: '\ud83c\udde6\ud83c\uddeb' },
+        { name: 'Tanzanya', flag: '\ud83c\uddf9\ud83c\uddff' },
+        { name: 'Endonezya', flag: '\ud83c\uddee\ud83c\udde9' },
+        { name: 'Gambia', flag: '\ud83c\uddec\ud83c\uddf2' },
+        { name: '\u00c7ad', flag: '\ud83c\uddf9\ud83c\udde9' },
+        { name: 'Somali', flag: '\ud83c\uddf8\ud83c\uddf4' },
     ];
+    const mottoWords = ['D\u00fcnyan\u0131n', 'her', 'yerinde', 'iyilik', 'ad\u0131mlar\u0131yla', 'mazlum', 'g\u00f6n\u00fcllere', 'umut', 've', '\u0131\u015f\u0131k', 'oluyoruz.'];
 
     const serviceAreas = [
         { country: 'Türkiye', areas: ['Eğitim', 'Acil Yardım'] },
@@ -191,37 +198,75 @@ export default function About() {
                 </div>
             </div>
 
-            {/* History Timeline */}
+            {/* History Timeline - Auto Scrolling */}
             <div className="py-20 overflow-hidden">
                 <div className="max-w-7xl mx-auto px-4 mb-12 text-center">
                     <h2 className="text-4xl font-bold text-[#103e6a] mb-4">Tarihçemiz</h2>
-                    <p className="text-gray-600">1986'dan bugüne uzanan iyilik yolculuğumuz.</p>
+                    <p className="text-gray-600">Dünyanın dört bir yanında iyilik adımları atıyoruz.</p>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="relative flex flex-col md:flex-row justify-between items-start gap-8 relative">
-                        {/* Connecting Line (Desktop) */}
-                        <div className="hidden md:block absolute top-[2.2rem] left-0 right-0 h-0.5 bg-gray-200 -z-10"></div>
+                {/* Scrolling timeline */}
+                <div className="timeline-wrapper relative overflow-hidden">
+                    {/* Connecting line */}
+                    <div className="absolute top-[0.7rem] left-0 right-0 h-0.5 bg-gray-200 z-0"></div>
 
-                        {historyEvents.map((event, index) => (
-                            <div key={index} className="flex-1 relative group w-full md:w-auto flex md:block items-start gap-4 md:gap-0">
+                    <div className="timeline-track flex" style={{ width: 'max-content' }}>
+                        {[...countries, ...countries, ...countries].map((c, index) => (
+                            <div key={index} className="timeline-item flex-shrink-0 relative group text-center">
                                 {/* Dot */}
-                                <div className="w-6 h-6 rounded-full bg-white border-4 border-[#12985a] md:mx-auto mb-6 shrink-0 relative z-10 group-hover:scale-125 transition-transform duration-300 shadow-sm"></div>
+                                <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-white border-4 border-[#12985a] mx-auto mb-4 md:mb-6 relative z-10 group-hover:scale-125 transition-transform duration-300 shadow-sm"></div>
 
-                                {/* Connecting Line (Mobile) */}
-                                {index !== historyEvents.length - 1 && (
-                                    <div className="md:hidden absolute left-[11px] top-6 bottom-[-2rem] w-0.5 bg-gray-200"></div>
-                                )}
-
-                                <div className="text-left md:text-center pt-1 md:pt-0">
-                                    <span className="block text-5xl md:text-6xl font-bold text-gray-200 mb-2 md:mb-4 group-hover:text-[#103e6a]/20 transition-colors duration-300">{event.year}</span>
-                                    <h3 className="text-lg font-bold text-[#103e6a] mb-1">{event.title}</h3>
-                                    <p className="text-sm text-gray-500 max-w-[200px] md:mx-auto">{event.description}</p>
-                                </div>
+                                {/* Big faded country name */}
+                                <span className="block text-3xl md:text-6xl font-bold text-gray-200 mb-1 md:mb-4 group-hover:text-[#103e6a]/20 transition-colors duration-300">{c.name}</span>
+                                {/* Flag only */}
+                                <span className="text-2xl md:text-3xl">{c.flag}</span>
                             </div>
                         ))}
                     </div>
                 </div>
+
+                {/* Motto - scrolling reverse */}
+                <div className="motto-wrapper mt-6 md:mt-10 overflow-hidden">
+                    <div className="motto-track flex" style={{ width: 'max-content' }}>
+                        {[...mottoWords, ...mottoWords, ...mottoWords, ...mottoWords, ...mottoWords, ...mottoWords].map((word, i) => (
+                            <span key={i} className="inline-flex items-center mx-1.5 md:mx-3">
+                                <span className="text-sm md:text-xl font-medium text-gray-400 italic">{word}</span>
+                                {i % mottoWords.length !== mottoWords.length - 1 && (
+                                    <span className="text-[#12985a] mx-1.5 md:mx-3 text-sm md:text-base">-</span>
+                                )}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+
+                <style>{`
+                    .timeline-item {
+                        width: 200px;
+                    }
+                    @media (min-width: 768px) {
+                        .timeline-item {
+                            width: 350px;
+                        }
+                    }
+                    @keyframes timeline-scroll {
+                        0% { transform: translateX(0); }
+                        100% { transform: translateX(calc(-100% / 3)); }
+                    }
+                    @keyframes motto-scroll {
+                        0% { transform: translateX(calc(-100% / 6)); }
+                        100% { transform: translateX(0); }
+                    }
+                    .timeline-track {
+                        animation: timeline-scroll 100s linear infinite;
+                    }
+                    .motto-track {
+                        animation: motto-scroll 50s linear infinite;
+                    }
+                    .timeline-wrapper:hover .timeline-track,
+                    .motto-wrapper:hover .motto-track {
+                        animation-play-state: paused;
+                    }
+                `}</style>
             </div>
 
             {/* Service Areas */}

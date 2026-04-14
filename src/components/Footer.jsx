@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import logo from '../assets/color-logo.png';
 import iyzicoLogo from '../assets/iyzico-logo.svg';
 
@@ -93,10 +94,10 @@ export default function Footer() {
             <div className="border-t border-gray-200">
                 <div className="mx-auto max-w-7xl px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-gray-500">
                     <p>© 2026 Saye Medya & Babil Yazılım. Tüm hakları saklıdır.</p>
-                    <div className="flex gap-6 text-[10px] sm:text-xs">
-                        <a href="#" className="hover:text-[#103e6a] transition-colors">Gizlilik Politikası</a>
-                        <a href="#" className="hover:text-[#103e6a] transition-colors">Kullanım Şartları</a>
-                        <a href="#" className="hover:text-[#103e6a] transition-colors">KVKK Aydınlatma Metni</a>
+                    <div className="flex flex-wrap gap-4 sm:gap-6 text-[10px] sm:text-xs">
+                        <Link to="/yasal/bilgi-guvenligi" className="hover:text-[#103e6a] transition-colors">Gizlilik Politikası</Link>
+                        <Link to="/yasal/uyelik-kosullari" className="hover:text-[#103e6a] transition-colors">Kullanım Şartları</Link>
+                        <Link to="/yasal/kvkk" className="hover:text-[#103e6a] transition-colors">KVKK Aydınlatma Metni</Link>
                     </div>
                 </div>
             </div>

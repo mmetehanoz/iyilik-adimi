@@ -672,12 +672,48 @@ export default function Payment() {
                 onClose={() => setShowMembershipModal(false)}
                 title="Üyelik Sözleşmesi"
             >
-                <div>
-                    <h4 className="font-bold mb-2">1. Taraflar</h4>
-                    <p className="mb-4">İşbu sözleşme İyilik Adımı ile Kullanıcı arasında akdedilmiştir...</p>
-                    <h4 className="font-bold mb-2">2. Konu</h4>
-                    <p className="mb-4">Sözleşmenin konusu, kullanıcının internet sitesinden faydalanma şartlarının belirlenmesidir.</p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                <div className="space-y-4 text-gray-700 text-sm leading-relaxed">
+                    <h4 className="font-bold text-[#103e6a]">İYİLİK ADIMI ULUSLARARASI İNSANİ YARDIM DERNEĞİ</h4>
+                    <h4 className="font-bold text-[#103e6a]">ÜYELİK VE KULLANIM KOŞULLARI</h4>
+
+                    <div>
+                        <h5 className="font-bold mb-1">1. TARAFLAR</h5>
+                        <p>Bu sözleşme, İyilik Adımı Uluslararası İnsani Yardım Derneği ile siteye üye olan kullanıcı ("Üye") arasında akdedilmiştir.</p>
+                    </div>
+                    <div>
+                        <h5 className="font-bold mb-1">2. ÜYELİK ŞARTLARI</h5>
+                        <ul className="list-disc pl-5 space-y-1">
+                            <li>Üye, verdiği bilgilerin doğru ve güncel olduğunu kabul eder.</li>
+                            <li>Yanlış veya eksik bilgi verilmesi halinde Dernek üyeliği askıya alma veya sonlandırma hakkına sahiptir.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 className="font-bold mb-1">3. KULLANIM KOŞULLARI</h5>
+                        <ul className="list-disc pl-5 space-y-1">
+                            <li>Site yalnızca hukuka uygun amaçlarla kullanılabilir.</li>
+                            <li>Üye, başkalarının haklarını ihlal edecek davranışlarda bulunamaz.</li>
+                            <li>Dernek, site içeriğinde değişiklik yapma hakkını saklı tutar.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 className="font-bold mb-1">4. BAĞIŞ VE İŞLEMLER</h5>
+                        <ul className="list-disc pl-5 space-y-1">
+                            <li>Yapılan bağışlar ilgili mevzuat kapsamında değerlendirilir.</li>
+                            <li>Üye, bağış işlemlerinin kendi rızasıyla gerçekleştiğini kabul eder.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 className="font-bold mb-1">5. FİKRİ MÜLKİYET</h5>
+                        <p>Site içeriği, tasarım, logo ve tüm materyaller Derneğe aittir ve izinsiz kullanılamaz.</p>
+                    </div>
+                    <div>
+                        <h5 className="font-bold mb-1">6. SORUMLULUK SINIRI</h5>
+                        <p>Dernek, teknik aksaklıklar veya üçüncü taraf hizmetlerden kaynaklı kesintilerden sorumlu değildir.</p>
+                    </div>
+                    <div>
+                        <h5 className="font-bold mb-1">7. SÖZLEŞME DEĞİŞİKLİĞİ</h5>
+                        <p>Dernek, sözleşme koşullarını güncelleme hakkını saklı tutar.</p>
+                    </div>
                 </div>
             </Modal>
 
@@ -686,10 +722,84 @@ export default function Payment() {
                 onClose={() => setShowConsentModal(false)}
                 title="Kişisel Veri Rıza Metni"
             >
-                <div>
-                    <h4 className="font-bold mb-2">Kişisel Verilerin İşlenmesi</h4>
-                    <p className="mb-4">6698 sayılı Kişisel Verilerin Korunması Kanunu uyarınca...</p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                <div className="space-y-4 text-gray-700 text-sm leading-relaxed">
+                    <h4 className="font-bold text-[#103e6a]">İYİLİK ADIMI ULUSLARARASI İNSANİ YARDIM DERNEĞİ</h4>
+                    <h4 className="font-bold text-[#103e6a]">KİŞİSEL VERİLERİN KORUNMASINA İLİŞKİN AYDINLATMA METNİ</h4>
+
+                    <p>T.C. İstanbul Valiliği İl Sivil Toplumla İlişkiler Müdürlüğü'nün 10.04.2025 tarihli onayı ile 34-292-063 kütük numarası ile faaliyet gösteren İyilik Adımı Uluslararası İnsani Yardım Derneği ("Dernek") olarak; 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") kapsamında, üyelerimizin, gönüllülerimizin, bağışçılarımızın ve tüm paydaşlarımızın kişisel verilerinin korunmasına büyük önem vermekteyiz.</p>
+                    <p>Derneğimiz, Veri Sorumlusu sıfatıyla; tarafımıza iletilen kişisel verilerin kaydedileceğini, saklanacağını, güncelleneceğini, mevzuatın izin verdiği durumlarda üçüncü kişilere aktarılabileceğini ve KVKK'da öngörülen şekillerde işlenebileceğini bilgilerinize sunar.</p>
+
+                    <div>
+                        <h5 className="font-bold mb-1">1. HANGİ KİŞİSEL VERİLERİ İŞLİYORUZ?</h5>
+                        <p className="mb-2">Derneğimiz tarafından aşağıdaki kişisel veriler işlenebilmektedir:</p>
+                        <ul className="list-disc pl-5 space-y-1">
+                            <li>Kimlik bilgileri (ad, soyad)</li>
+                            <li>İletişim bilgileri (telefon, e-posta, adres)</li>
+                            <li>Dernek faaliyetlerine ilişkin görsel ve işitsel kayıtlar (fotoğraf ve video)</li>
+                            <li>Bağış bilgileri</li>
+                            <li>Gönüllülük ve üyelik süreçlerine ilişkin bilgiler</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 className="font-bold mb-1">2. KİŞİSEL VERİLERİN TOPLANMA YÖNTEMİ</h5>
+                        <p className="mb-2">Kişisel verileriniz;</p>
+                        <ul className="list-disc pl-5 space-y-1">
+                            <li>Derneğimizin internet sitesi üzerinden,</li>
+                            <li>Sosyal medya hesaplarımız aracılığıyla,</li>
+                            <li>Dernek merkezinde veya etkinliklerde doldurulan formlar yoluyla,</li>
+                            <li>E-posta, telefon veya diğer iletişim kanalları ile</li>
+                        </ul>
+                        <p className="mt-2">sözlü, yazılı veya elektronik ortamda toplanmaktadır.</p>
+                    </div>
+                    <div>
+                        <h5 className="font-bold mb-1">3. KİŞİSEL VERİLERİN İŞLENME AMAÇLARI</h5>
+                        <p className="mb-2">Toplanan kişisel verileriniz;</p>
+                        <ul className="list-disc pl-5 space-y-1">
+                            <li>Üyelik ve gönüllülük süreçlerinin yürütülmesi</li>
+                            <li>Bağış ve yardım organizasyonlarının yönetilmesi</li>
+                            <li>Dernek faaliyetleri hakkında bilgilendirme yapılması</li>
+                            <li>Etkinliklerin planlanması ve yürütülmesi</li>
+                            <li>Yasal yükümlülüklerin yerine getirilmesi</li>
+                            <li>İstatistiksel analizlerin yapılması (kimlik ifşa edilmeden)</li>
+                            <li>Dernek ile paydaşlar arasındaki iletişimin sağlanması</li>
+                        </ul>
+                        <p className="mt-2">amaçlarıyla işlenmektedir.</p>
+                    </div>
+                    <div>
+                        <h5 className="font-bold mb-1">4. KİŞİSEL VERİLERİN AKTARILABİLECEĞİ KİŞİ VE KURULUŞLAR</h5>
+                        <p className="mb-2">Kişisel verileriniz;</p>
+                        <ul className="list-disc pl-5 space-y-1">
+                            <li>İlgili mevzuat gereği yetkili kamu kurum ve kuruluşlarına,</li>
+                            <li>Bankalar, ödeme kuruluşları, muhasebe hizmet sağlayıcıları gibi iş ortaklarına,</li>
+                            <li>Hukuki zorunluluklar kapsamında yetkili mercilere</li>
+                        </ul>
+                        <p className="mt-2">aktarılabilecektir.</p>
+                    </div>
+                    <div>
+                        <h5 className="font-bold mb-1">5. KVKK KAPSAMINDAKİ HAKLARINIZ</h5>
+                        <p className="mb-2">KVKK'nın 11. maddesi uyarınca;</p>
+                        <ul className="list-disc pl-5 space-y-1">
+                            <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme</li>
+                            <li>İşlenmişse bilgi talep etme</li>
+                            <li>İşlenme amacını öğrenme</li>
+                            <li>Aktarıldığı üçüncü kişileri bilme</li>
+                            <li>Eksik/yanlış işlenmişse düzeltilmesini isteme</li>
+                            <li>Silinmesini veya yok edilmesini isteme</li>
+                            <li>Bu işlemlerin üçüncü kişilere bildirilmesini isteme</li>
+                            <li>Otomatik sistemlere itiraz etme</li>
+                            <li>Zarara uğramanız hâlinde tazminat talep etme</li>
+                        </ul>
+                        <p className="mt-2">haklarına sahipsiniz.</p>
+                    </div>
+                    <div>
+                        <h5 className="font-bold mb-1">6. BAŞVURU YOLLARI</h5>
+                        <p className="mb-2">Haklarınızı kullanmak için taleplerinizi; ıslak imzalı dilekçe ile aşağıdaki adrese gönderebilir veya e-posta yoluyla iletebilirsiniz:</p>
+                        <div className="bg-gray-50 rounded-lg p-4 space-y-1">
+                            <p><strong>Veri Sorumlusu:</strong> İyilik Adımı Uluslararası İnsani Yardım Derneği</p>
+                            <p><strong>Adres:</strong> Yukarı Dudullu Mah. Katibim Sokak Dış Kapı No: 1 İç Kapı No: 1 Ümraniye / İstanbul / Türkiye</p>
+                            <p><strong>E-posta:</strong> info@iyilikadimi.org.tr</p>
+                        </div>
+                    </div>
                 </div>
             </Modal>
         </div>

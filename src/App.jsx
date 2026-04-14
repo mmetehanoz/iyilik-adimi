@@ -28,6 +28,7 @@ import StoryDetail from './pages/StoryDetail';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailed from './pages/PaymentFailed';
 import DuyurPage from './pages/DuyuPages';
+import LegalPage from './pages/LegalPage';
 
 import ProjectDetail from './pages/ProjectDetail';
 
@@ -65,6 +66,7 @@ function App() {
                 <Route path="/hikayeler/:slug" element={<StoryDetail />} />
                 <Route path="/projeler/:slug" element={<ProjectDetail />} />
                 <Route path="/duyur" element={<DuyurPage />} />
+                <Route path="/yasal/:slug" element={<LegalPage />} />
               </Routes>
             </main>
 
