@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -31,20 +31,26 @@ import DuyurPage from './pages/DuyuPages';
 import LegalPage from './pages/LegalPage';
 
 import ProjectDetail from './pages/ProjectDetail';
+import PublicVideoView from './pages/PublicVideoView';
 
 function App() {
+  const location = useLocation();
+  const normalizedPath = location.pathname.replace(/\/+$/, '');
+  const isPublicVideoRoute = /^\/(?:iyilik-adimi\/)?v\//.test(normalizedPath + '/');
+
   return (
     <AuthProvider>
       <ToastProvider>
         <CartProvider>
           <div className="font-sans antialiased text-gray-800 overflow-x-hidden">
             <ScrollToTop />
-            <Header />
-            <CartDrawer />
+            {!isPublicVideoRoute && <Header />}
+            {!isPublicVideoRoute && <CartDrawer />}
 
             <main>
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/iyilik-adimi" element={<Home />} />
                 <Route path="/bagislar" element={<Donations />} />
                 <Route path="/hakkimizda" element={<About />} />
                 <Route path="/rehber/zekat-nedir" element={<ZekatGuide />} />
@@ -67,11 +73,13 @@ function App() {
                 <Route path="/projeler/:slug" element={<ProjectDetail />} />
                 <Route path="/duyur" element={<DuyurPage />} />
                 <Route path="/yasal/:slug" element={<LegalPage />} />
+                <Route path="/v/:shortId" element={<PublicVideoView />} />
+                <Route path="/iyilik-adimi/v/:shortId" element={<PublicVideoView />} />
               </Routes>
             </main>
 
-            <Footer />
-            <WhatsAppButton />
+            {!isPublicVideoRoute && <Footer />}
+            {!isPublicVideoRoute && <WhatsAppButton />}
           </div>
         </CartProvider>
       </ToastProvider>

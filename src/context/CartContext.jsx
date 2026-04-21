@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import * as api from '../services/api';
 import { useToast } from './ToastContext';
 
@@ -21,6 +21,34 @@ export function CartProvider({ children }) {
         fetchCart();
     }, []);
 
+    const normalizeAmountForApi = (value) => {
+        if (value === null || value === undefined) return null;
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            return value.toFixed(2);
+        }
+
+        if (typeof value === 'string') {
+            const cleaned = value
+                .trim()
+                .replace(/\s/g, '')
+                .replace(/[^0-9,.-]/g, '');
+
+            if (!cleaned) return null;
+
+            // Turkish formatted values like "1.250,50" -> "1250.50"
+            const normalized = cleaned.includes(',')
+                ? cleaned.replace(/\./g, '').replace(',', '.')
+                : cleaned;
+
+            const parsed = Number(normalized);
+            if (Number.isFinite(parsed) && parsed > 0) {
+                return parsed.toFixed(2);
+            }
+        }
+
+        return null;
+    };
+
     const fetchCart = async () => {
         try {
             setLoading(true);
@@ -40,6 +68,14 @@ export function CartProvider({ children }) {
     const addToCart = async (item) => {
         try {
             setLoading(true);
+
+            const normalizedAmount = normalizeAmountForApi(
+                item?._submissionData?.amount ?? item?.price
+            );
+            if (!normalizedAmount) {
+                showToast("Bağış tutarı geçersiz görünüyor. Lütfen tekrar deneyiniz.", "error");
+                return;
+            }
 
             // 0. Duplicate Check (Sepette aynı ürün var mı?)
             // Kurban hisse submission'ları her zaman benzersizdir (farklı katılımcılar), atla.
@@ -100,10 +136,18 @@ export function CartProvider({ children }) {
 
             // Dinamik form verilerini hazırla (form_data JSONField için)
             const formData = {};
-            if (item.selectedOption) {
-                // Hem selected_country hem genel selection olarak ekleyelim, esneklik olsun
-                formData.selected_country = item.selectedOption;
-                formData.selection = item.selectedOption;
+            const selectedCountry = item.selected_country || item.country || null;
+            const donationType = item.donation_type || item.type || null;
+            const selectedOption = item.selectedOption || null;
+
+            if (selectedCountry) {
+                formData.selected_country = selectedCountry;
+            }
+            if (selectedOption) {
+                formData.selection = selectedOption;
+            }
+            if (donationType) {
+                formData.donation_type = donationType;
             }
             // İleride başka dinamik alanlar gelirse buraya eklenebilir (örn: item.form_data varsa merge et)
             if (item.form_data) {
@@ -112,10 +156,10 @@ export function CartProvider({ children }) {
 
             let submissionData = {
                 donation: item.id,
-                amount: item.price,
+                amount: normalizedAmount,
                 currency: (item.currency && typeof item.currency === 'object') ? item.currency.id : item.currency,
-                donation_type: item.donation_type || item.type,
-                selected_country: item.selectedOption,
+                donation_type: donationType,
+                selected_country: selectedCountry,
                 form_data: formData,
                 payment_source: 'web_site',
                 cf_turnstile_response: ''
@@ -124,6 +168,7 @@ export function CartProvider({ children }) {
             // Eğer item içinde backend için hazırlanmış özel veri varsa onu kullan (Override)
             if (item._submissionData) {
                 submissionData = { ...submissionData, ...item._submissionData };
+                submissionData.amount = normalizeAmountForApi(submissionData.amount) || normalizedAmount;
                 // Form data merge (varsa)
                 if (item._submissionData.form_data) {
                     submissionData.form_data = { ...formData, ...item._submissionData.form_data };
@@ -151,7 +196,12 @@ export function CartProvider({ children }) {
 
         } catch (error) {
             console.error('Add to cart failed:', error);
-            showToast("Sepete eklenirken bir hata oluştu. Lütfen tekrar deneyiniz.", "error");
+            const amountError = error?.response?.data?.amount?.[0];
+            const nonFieldError = error?.response?.data?.detail || error?.response?.data?.error;
+            showToast(
+                amountError || nonFieldError || "Sepete eklenirken bir hata oluştu. Lütfen tekrar deneyiniz.",
+                "error"
+            );
         } finally {
             setLoading(false);
         }

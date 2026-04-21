@@ -1,8 +1,31 @@
 import axios from 'axios';
 
+function isLocalhostHost(hostname) {
+    return hostname === 'localhost' || hostname === '127.0.0.1';
+}
+
+function resolveApiBaseUrl() {
+    const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+
+    if (!configuredBaseUrl) {
+        return '';
+    }
+
+    try {
+        const parsedUrl = new URL(configuredBaseUrl);
+        if (typeof window !== 'undefined' && isLocalhostHost(parsedUrl.hostname) && !isLocalhostHost(window.location.hostname)) {
+            return '';
+        }
+    } catch {
+        return configuredBaseUrl.replace(/\/$/, '');
+    }
+
+    return configuredBaseUrl.replace(/\/$/, '');
+}
+
 // Axios instance oluşturma
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: resolveApiBaseUrl(),
     headers: {
         'Content-Type': 'application/json',
     },
@@ -34,7 +57,7 @@ api.interceptors.response.use(
             const refresh = localStorage.getItem('refresh_token');
             if (refresh) {
                 try {
-                    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/hesap/token/yenile/`, { refresh });
+                    const response = await axios.post(`${resolveApiBaseUrl()}/hesap/token/yenile/`, { refresh });
                     const { access } = response.data;
                     localStorage.setItem('access_token', access);
                     api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
@@ -197,6 +220,26 @@ export const getProjectDetail = async (slug) => {
         return response.data;
     } catch (error) {
         console.error("Proje detayı yüklenirken hata oluştu:", error);
+        throw error;
+    }
+};
+
+export const getPublicVideoByShortId = async (shortId) => {
+    try {
+        const response = await api.get(`/ortaklar/public/videos/short/${shortId}/`);
+        return response.data;
+    } catch (error) {
+        console.error('Public video yüklenirken hata oluştu:', error);
+        throw error;
+    }
+};
+
+export const incrementPublicVideoView = async (shortId) => {
+    try {
+        const response = await api.post(`/ortaklar/videos/short/${shortId}/increment-view/`);
+        return response.data;
+    } catch (error) {
+        console.error('Video görüntülenme sayısı güncellenemedi:', error);
         throw error;
     }
 };
