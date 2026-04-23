@@ -7,8 +7,10 @@ import slider5 from '../assets/slider/s4.webp';
 import slider6 from '../assets/slider/s5.webp';
 import slider7 from '../assets/slider/s6.webp';
 import slider8 from '../assets/slider/s69.webp';
+import slider9 from '../assets/slider/kurban-bayrami-iyilikadimi4.webp';
 
 const slides = [
+    { id: 1, image: slider9 },
     { id: 2, image: slider2, title: 'Umut Ol!', subtitle: 'BİR ÇOCUĞUN GÜLÜMSEMESİ DÜNYAYA BEDEL' },
     { id: 3, image: slider3, title: 'Paylaşmak Güzeldir', subtitle: 'İHTİYAÇ SAHİPLERİNE EL UZAT' },
     { id: 4, image: slider4, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
@@ -47,9 +49,6 @@ export default function Hero() {
                             }}
                         />
                     ))}
-
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-black/40" />
 
                     {/* Slide text */}
                     <div className="absolute inset-0 flex items-start justify-center z-10 pt-45">
