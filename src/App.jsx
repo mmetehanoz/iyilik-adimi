@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
@@ -33,10 +34,24 @@ import LegalPage from './pages/LegalPage';
 import ProjectDetail from './pages/ProjectDetail';
 import PublicVideoView from './pages/PublicVideoView';
 
+const GOOGLE_ANALYTICS_ID = 'G-Z5J8P9X8W3';
+
 function App() {
   const location = useLocation();
   const normalizedPath = location.pathname.replace(/\/+$/, '');
   const isPublicVideoRoute = /^\/(?:iyilik-adimi\/)?v\//.test(normalizedPath + '/');
+
+  useEffect(() => {
+    if (typeof window.gtag !== 'function') {
+      return;
+    }
+
+    window.gtag('config', GOOGLE_ANALYTICS_ID, {
+      page_path: `${location.pathname}${location.search}${location.hash}`,
+      page_title: document.title,
+      page_location: window.location.href,
+    });
+  }, [location]);
 
   return (
     <AuthProvider>
