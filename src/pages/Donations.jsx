@@ -164,7 +164,7 @@ export default function Donations() {
                             freeMode={true}
                             slidesOffsetAfter={16}
                             autoplay={{
-                                delay: 3000,
+                                delay: 5000,
                                 disableOnInteraction: false,
                                 pauseOnMouseEnter: true
                             }}

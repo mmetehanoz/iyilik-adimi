@@ -70,7 +70,7 @@ export default function HopeStories() {
                         loop={true}
                         grabCursor={true}
                         autoplay={{
-                            delay: 4000,
+                            delay: 6000,
                             disableOnInteraction: false,
                             pauseOnMouseEnter: true,
                         }}

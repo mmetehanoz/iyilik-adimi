@@ -55,7 +55,7 @@ export default function Instagram() {
                         speed={1000}
                         grabCursor={true}
                         autoplay={{
-                            delay: 5000,
+                            delay: 7000,
                             disableOnInteraction: false,
                             pauseOnMouseEnter: true,
                         }}

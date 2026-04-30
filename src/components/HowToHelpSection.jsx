@@ -120,7 +120,7 @@ const HowToHelpSection = () => {
     autoScrollIntervalRef.current = setInterval(() => {
       if (isUserScrollingRef.current) return;
       goNext();
-    }, 5000);
+    }, 7000);
 
     return () => {
       if (autoScrollIntervalRef.current) clearInterval(autoScrollIntervalRef.current);

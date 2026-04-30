@@ -105,7 +105,7 @@ export default function Causes() {
                     speed={2000}
                     grabCursor={true}
                     autoplay={{
-                        delay: 3000,
+                        delay: 5000,
                         disableOnInteraction: false,
                         pauseOnMouseEnter: true,
                     }}
