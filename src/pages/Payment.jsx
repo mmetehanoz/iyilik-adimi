@@ -579,7 +579,15 @@ export default function Payment() {
                                             )}
                                             <div className="flex-1">
                                                 <p className="font-medium text-gray-900 line-clamp-2">{donationTitle}</p>
-                                                {item.form_data?.selected_country && <p className="text-gray-500 text-xs">{item.form_data.selected_country}</p>}
+                                                {item.form_data?.selected_country && (
+                                                    <p className="text-gray-500 text-xs">
+                                                        {item.form_data.selected_country === 'gaza'
+                                                            ? 'Gazze'
+                                                            : item.form_data.selected_country === 'african'
+                                                                ? 'Afrika'
+                                                                : item.form_data.selected_country}
+                                                    </p>
+                                                )}
                                                 <div className="flex justify-between mt-1 text-xs text-gray-600">
                                                     <span>{item.quantity} Adet</span>
                                                     <span className="font-bold">{new Intl.NumberFormat('tr-TR').format(unitPrice * item.quantity)} ₺</span>

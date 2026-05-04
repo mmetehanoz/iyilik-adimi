@@ -99,7 +99,13 @@ export default function CartDrawer() {
 
                                             {/* Seçenek Gösterimi (varsa form_data içinde) */}
                                             {item.form_data && item.form_data.selected_country && (
-                                                <p className="text-xs text-gray-500 mt-1">{item.form_data.selected_country}</p>
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    {item.form_data.selected_country === 'gaza'
+                                                        ? 'Gazze'
+                                                        : item.form_data.selected_country === 'african'
+                                                            ? 'Afrika'
+                                                            : item.form_data.selected_country}
+                                                </p>
                                             )}
 
                                             <div className="flex items-center justify-between mt-3">
