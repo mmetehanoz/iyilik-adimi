@@ -85,6 +85,43 @@ body {
     animation: heartbeat 2s infinite ease-in-out;
 }
 
+@keyframes hero-cta-shine {
+    0% {
+        transform: translateX(-140%) skewX(-18deg);
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 0.15;
+    }
+
+    45% {
+        opacity: 0.4;
+    }
+
+    100% {
+        transform: translateX(220%) skewX(-18deg);
+        opacity: 0;
+    }
+}
+
+.hero-cta {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow: 0 12px 30px rgba(18, 152, 90, 0.35);
+}
+
+.hero-cta::before {
+    content: '';
+    position: absolute;
+    inset: -20% auto -20% -35%;
+    width: 34%;
+    background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.1) 30%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0.12) 70%, transparent 100%);
+    animation: hero-cta-shine 2.8s infinite;
+    pointer-events: none;
+}
+
 .animate-shake {
     animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
 }

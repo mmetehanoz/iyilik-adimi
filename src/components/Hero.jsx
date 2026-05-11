@@ -30,13 +30,13 @@ export default function Hero() {
             <div id="anasayfa" className="relative z-20 pt-24 md:pt-0">
 
                 {/* Slider section — overflow-hidden sadece burada */}
-                <section className="relative aspect-video md:aspect-auto md:min-h-[80vh] w-full overflow-hidden">
+                <section className="relative aspect-video w-full overflow-hidden lg:aspect-auto lg:min-h-[80vh]">
 
                     {/* Background slides */}
                     {slides.map((slide, index) => (
                         <div
                             key={slide.id}
-                            className="absolute inset-0 transition-opacity duration-1000 bg-cover bg-center bg-no-repeat"
+                            className="absolute inset-0 bg-cover bg-[position:62%_center] bg-no-repeat transition-opacity duration-1000 sm:bg-[position:58%_center] lg:bg-center"
                             style={{
                                 opacity: index === 0 ? 1 : 0,
                                 backgroundImage: `url(${slide.image})`,
@@ -45,11 +45,11 @@ export default function Hero() {
                     ))}
 
                     {/* Slide CTA */}
-                    <div className="absolute inset-x-0 top-[34%] z-10 flex justify-center px-4 sm:top-[38%] md:top-[42%]">
+                    <div className="absolute inset-x-0 bottom-2 z-10 flex justify-center px-4 sm:bottom-4 lg:bottom-auto lg:top-[42%]">
                         <div className="text-center">
                             <Link
                                 to="/bagislar?kategori=Kurban%20Bayramı"
-                                className="inline-flex items-center justify-center rounded-full bg-[#12985a] px-7 py-3 text-sm font-bold uppercase tracking-[0.18em] text-white shadow-lg transition hover:bg-[#0f7c49]"
+                                className="hero-cta animate-heartbeat inline-flex items-center justify-center rounded-full bg-[#12985a] px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white shadow-lg transition hover:bg-[#0f7c49] sm:px-6 sm:text-xs lg:px-7 lg:py-3 lg:text-sm"
                             >
                                 Kurban Bağışı Yap
                             </Link>
@@ -57,12 +57,13 @@ export default function Hero() {
                     </div>
 
                     {/* Scroll down button (desktop only) */}
-                    <div className="absolute bottom-20 left-0 right-0 z-20 hidden md:flex justify-center pointer-events-none">
+                    <div className="absolute bottom-20 left-0 right-0 z-20 hidden lg:flex justify-center pointer-events-none">
                         <button className="h-12 w-12 rounded-full border-2 border-[#12985a] text-white hover:bg-[#12985a]/10 animate-bounce pointer-events-auto">
                             ↓
                         </button>
                     </div>
                 </section>
+
             </div>
 
             {/* QuickDonation: Normal flow, slider'dan ayrı */}
