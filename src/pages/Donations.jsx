@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode, Autoplay } from 'swiper/modules';
@@ -36,6 +36,20 @@ export default function Donations() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const location = useLocation();
+    const navigate = useNavigate();
+
+    const handleTabChange = (category) => {
+        setActiveTab(category.id);
+
+        const params = new URLSearchParams(location.search);
+        params.delete('category');
+        params.set('kategori', category.title);
+
+        navigate({
+            pathname: location.pathname,
+            search: `?${params.toString()}`
+        }, { replace: true });
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -180,7 +194,7 @@ export default function Donations() {
                             {categories.map((cat) => (
                                 <SwiperSlide key={cat.id} className="!w-auto">
                                     <button
-                                        onClick={() => setActiveTab(cat.id)}
+                                        onClick={() => handleTabChange(cat)}
                                         className={`px-6 py-3 rounded-full flex items-center gap-2 transition-all duration-300 font-bold border text-sm sm:text-base whitespace-nowrap
                       ${activeTab === cat.id
                                                 ? 'bg-[#103e6a] text-white border-[#103e6a] shadow-lg scale-105'
