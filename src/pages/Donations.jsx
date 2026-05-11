@@ -9,6 +9,8 @@ import { getCategories, getDonations } from '../services/api';
 import { useToast } from '../context/ToastContext';
 import KurbanShareModal from '../components/KurbanShareModal';
 
+const normalizeCategoryName = (value = '') => value.toLocaleLowerCase('tr-TR').trim();
+
 // Helper to assign icons based on category name
 const getCategoryIcon = (name) => {
     const lowerName = name.toLowerCase();
@@ -95,11 +97,15 @@ export default function Donations() {
                         match = processedCategories.find(cat => cat.id === parseInt(categoryId));
                         console.log('📌 ID ile eşleşen kategori:', match);
                     } else if (kategori) {
-                        // Kategori adını (örn. "Gazze") kategori başlığına (örn. "GAZZE") eşle
+                        const normalizedKategori = normalizeCategoryName(kategori);
+
+                        // Önce tam eşleşme dene; bulunamazsa eski esnek eşleşmeye düş.
                         match = processedCategories.find(cat =>
-                            cat.title.toLowerCase().includes(kategori.toLowerCase()) ||
-                            kategori.toLowerCase().includes(cat.title.toLowerCase())
-                        );
+                            normalizeCategoryName(cat.title) === normalizedKategori
+                        ) || processedCategories.find(cat => {
+                            const normalizedTitle = normalizeCategoryName(cat.title);
+                            return normalizedTitle.includes(normalizedKategori) || normalizedKategori.includes(normalizedTitle);
+                        });
                         console.log('📌 İsim ile eşleşen kategori:', match);
                     }
                     console.log('📌 setActiveTab:', match ? match.id : processedCategories[0].id);
