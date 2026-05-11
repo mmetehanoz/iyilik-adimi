@@ -1,35 +1,29 @@
-import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import QuickDonation from './QuickDonation';
-import slider2 from '../assets/slider/s1.webp';
-import slider3 from '../assets/slider/s2.webp';
-import slider4 from '../assets/slider/s3.webp';
-import slider5 from '../assets/slider/s4.webp';
-import slider6 from '../assets/slider/s5.webp';
-import slider7 from '../assets/slider/s6.webp';
-import slider8 from '../assets/slider/s69.webp';
+// import slider2 from '../assets/slider/s1.webp';
+// import slider3 from '../assets/slider/s2.webp';
+// import slider4 from '../assets/slider/s3.webp';
+// import slider5 from '../assets/slider/s4.webp';
+// import slider6 from '../assets/slider/s5.webp';
+// import slider7 from '../assets/slider/s6.webp';
+// import slider8 from '../assets/slider/s69.webp';
 import slider9 from '../assets/slider/kurban-bayrami-iyilikadimi4.webp';
 
 const slides = [
-    { id: 1, image: slider9 },
-    { id: 2, image: slider2, title: 'Umut Ol!', subtitle: 'BİR ÇOCUĞUN GÜLÜMSEMESİ DÜNYAYA BEDEL' },
-    { id: 3, image: slider3, title: 'Paylaşmak Güzeldir', subtitle: 'İHTİYAÇ SAHİPLERİNE EL UZAT' },
-    { id: 4, image: slider4, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
-    { id: 5, image: slider5, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
-    { id: 6, image: slider6, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
-    { id: 7, image: slider7, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
-    { id: 8, image: slider8, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
+    {
+        id: 1,
+        image: slider9,
+    },
+    // { id: 2, image: slider2, title: 'Umut Ol!', subtitle: 'BİR ÇOCUĞUN GÜLÜMSEMESİ DÜNYAYA BEDEL' },
+    // { id: 3, image: slider3, title: 'Paylaşmak Güzeldir', subtitle: 'İHTİYAÇ SAHİPLERİNE EL UZAT' },
+    // { id: 4, image: slider4, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
+    // { id: 5, image: slider5, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
+    // { id: 6, image: slider6, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
+    // { id: 7, image: slider7, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
+    // { id: 8, image: slider8, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
 ];
 
 export default function Hero() {
-    const [current, setCurrent] = useState(0);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrent(prev => (prev + 1) % slides.length);
-        }, 8000);
-        return () => clearInterval(interval);
-    }, []);
-
     return (
         <>
             {/* Wrapper: Slider content */}
@@ -44,21 +38,21 @@ export default function Hero() {
                             key={slide.id}
                             className="absolute inset-0 transition-opacity duration-1000 bg-cover bg-center bg-no-repeat"
                             style={{
-                                opacity: index === current ? 1 : 0,
+                                opacity: index === 0 ? 1 : 0,
                                 backgroundImage: `url(${slide.image})`,
                             }}
                         />
                     ))}
 
-                    {/* Slide text */}
-                    <div className="absolute inset-0 flex items-start justify-center z-10 pt-45">
-                        <div className="w-full px-4 text-center text-white">
-                            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight drop-shadow-lg">
-                                {slides[current].title}
-                            </h1>
-                            <p className="mt-4 text-xs sm:text-sm md:text-base tracking-[0.2em] text-white/90 drop-shadow-md font-medium">
-                                {slides[current].subtitle}
-                            </p>
+                    {/* Slide CTA */}
+                    <div className="absolute inset-x-0 top-[34%] z-10 flex justify-center px-4 sm:top-[38%] md:top-[42%]">
+                        <div className="text-center">
+                            <Link
+                                to="/bagislar?kategori=Kurban%20Bayramı"
+                                className="inline-flex items-center justify-center rounded-full bg-[#12985a] px-7 py-3 text-sm font-bold uppercase tracking-[0.18em] text-white shadow-lg transition hover:bg-[#0f7c49]"
+                            >
+                                Kurban Bağışı Yap
+                            </Link>
                         </div>
                     </div>
 
