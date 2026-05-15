@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import QuickDonation from './QuickDonation';
+import DonationCategoryShowcase from './DonationCategoryShowcase';
 // import slider2 from '../assets/slider/s1.webp';
 // import slider3 from '../assets/slider/s2.webp';
 // import slider4 from '../assets/slider/s3.webp';
@@ -57,7 +58,7 @@ export default function Hero() {
                     </div>
 
                     {/* Scroll down button (desktop only) */}
-                    <div className="absolute bottom-20 left-0 right-0 z-20 hidden lg:flex justify-center pointer-events-none">
+                    <div className="absolute bottom-0 left-0 right-0 z-20 hidden lg:flex justify-center pointer-events-none">
                         <button className="h-12 w-12 rounded-full border-2 border-[#12985a] text-white hover:bg-[#12985a]/10 animate-bounce pointer-events-auto">
                             ↓
                         </button>
@@ -68,6 +69,7 @@ export default function Hero() {
 
             {/* QuickDonation: Normal flow, slider'dan ayrı */}
             <QuickDonation />
+            <DonationCategoryShowcase />
         </>
     );
 }

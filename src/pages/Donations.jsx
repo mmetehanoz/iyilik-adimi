@@ -1,34 +1,112 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { FreeMode, Autoplay } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/free-mode';
 import { getCategories, getDonations } from '../services/api';
 import { useToast } from '../context/ToastContext';
 import KurbanShareModal from '../components/KurbanShareModal';
-
-const normalizeCategoryName = (value = '') => value.toLocaleLowerCase('tr-TR').trim();
-
-// Helper to assign icons based on category name
-const getCategoryIcon = (name) => {
-    const lowerName = name.toLowerCase();
-    if (lowerName.includes('kurban')) return '🐑';
-    if (lowerName.includes('gazze')) return '🇵🇸';
-    if (lowerName.includes('yemek') || lowerName.includes('gıda') || lowerName.includes('iftar')) return '🍲';
-    if (lowerName.includes('su') || lowerName.includes('kuyu')) return '💧';
-    if (lowerName.includes('yetim') || lowerName.includes('çocuk')) return '👦';
-    if (lowerName.includes('acil')) return '🚨';
-    if (lowerName.includes('eğitim') || lowerName.includes('kırtasiye') || lowerName.includes('öğrenci')) return '✏️';
-    if (lowerName.includes('sağlık') || lowerName.includes('ilaç')) return '⚕️';
-    if (lowerName.includes('nakdi') || lowerName.includes('zekat') || lowerName.includes('sadaka')) return '💰';
-    if (lowerName.includes('kumanya')) return '📦';
-    return '🌍';
-};
+import { getCategoryIcon, normalizeCategoryName } from '../utils/donationCategories';
 
 // Placeholder image if backend sends none
 const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800&auto=format&fit=crop';
+
+const getPriceValue = (value) => {
+    const parsed = parseFloat(value || 0);
+    return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getSortedDonationTypes = (item) => (
+    item.donation_types
+        ? [...item.donation_types].sort((a, b) => getPriceValue(a.price) - getPriceValue(b.price))
+        : []
+);
+
+const resolveMatchingVariant = (item, selectedCountry, selectedType) => {
+    const variants = item.price_variants || [];
+    const donationTypeId = selectedType?.id || null;
+
+    if (donationTypeId && selectedCountry) {
+        const exactVariant = variants.find((variant) =>
+            variant.donation_type_id === donationTypeId && variant.country === selectedCountry
+        );
+        if (exactVariant) return exactVariant;
+    }
+
+    if (donationTypeId) {
+        const typeVariant = variants.find((variant) =>
+            variant.donation_type_id === donationTypeId && !variant.country
+        );
+        if (typeVariant) return typeVariant;
+    }
+
+    if (selectedCountry) {
+        const countryVariant = variants.find((variant) =>
+            variant.country === selectedCountry && !variant.donation_type_id
+        );
+        if (countryVariant) return countryVariant;
+    }
+
+    if (donationTypeId) {
+        const fallbackTypeVariant = variants.find((variant) => variant.donation_type_id === donationTypeId);
+        if (fallbackTypeVariant) return fallbackTypeVariant;
+    }
+
+    if (selectedCountry) {
+        const fallbackCountryVariant = variants.find((variant) => variant.country === selectedCountry);
+        if (fallbackCountryVariant) return fallbackCountryVariant;
+    }
+
+    return variants[0] || null;
+};
+
+const getDefaultSelections = (item) => {
+    const sortedTypes = getSortedDonationTypes(item);
+    const variants = [...(item.price_variants || [])]
+        .sort((a, b) => getPriceValue(a.price) - getPriceValue(b.price));
+
+    const preferredVariant = variants.find((variant) => variant.donation_type_id && variant.country) || variants[0] || null;
+
+    const defaultType = preferredVariant?.donation_type_id
+        ? sortedTypes.find((type) => type.id === preferredVariant.donation_type_id) || null
+        : (sortedTypes[0] || null);
+
+    const defaultCountry = preferredVariant?.country
+        || item.available_countries?.[0]
+        || null;
+
+    return {
+        defaultCountry,
+        defaultType
+    };
+};
+
+const getCategoryLayoutClass = (index, total) => {
+    const classes = ['col-span-1'];
+
+    if (total % 2 === 1 && index === total - 1) {
+        classes.push('col-span-2');
+    }
+
+    if (total > 4) {
+        const remainder = total % 4;
+
+        if (remainder === 1 && index === total - 1) {
+            classes.push('lg:col-span-2', 'lg:col-start-4');
+        } else if (remainder === 2) {
+            if (index === total - 2) classes.push('lg:col-span-2', 'lg:col-start-3');
+            if (index === total - 1) classes.push('lg:col-span-2', 'lg:col-start-5');
+        } else if (remainder === 3) {
+            if (index === total - 3) classes.push('lg:col-span-2', 'lg:col-start-2');
+            if (index === total - 2) classes.push('lg:col-span-2', 'lg:col-start-4');
+            if (index === total - 1) classes.push('lg:col-span-2', 'lg:col-start-6');
+        } else {
+            classes.push('lg:col-span-2');
+        }
+    } else {
+        classes.push('lg:col-span-2');
+    }
+
+    return classes.join(' ');
+};
 
 export default function Donations() {
     const [categories, setCategories] = useState([]);
@@ -102,14 +180,9 @@ export default function Donations() {
                     // İsim parametresini kontrol et (projektler menüsünden gelmişse)
                     const kategori = params.get('kategori');
 
-                    console.log('📌 Donations - location.search:', location.search);
-                    console.log('📌 Donations - categoryId param:', categoryId);
-                    console.log('📌 Donations - kategori param:', kategori);
-
                     let match = null;
                     if (categoryId) {
                         match = processedCategories.find(cat => cat.id === parseInt(categoryId));
-                        console.log('📌 ID ile eşleşen kategori:', match);
                     } else if (kategori) {
                         const normalizedKategori = normalizeCategoryName(kategori);
 
@@ -120,9 +193,7 @@ export default function Donations() {
                             const normalizedTitle = normalizeCategoryName(cat.title);
                             return normalizedTitle.includes(normalizedKategori) || normalizedKategori.includes(normalizedTitle);
                         });
-                        console.log('📌 İsim ile eşleşen kategori:', match);
                     }
-                    console.log('📌 setActiveTab:', match ? match.id : processedCategories[0].id);
                     setActiveTab(match ? match.id : processedCategories[0].id);
                 }
 
@@ -176,37 +247,22 @@ export default function Donations() {
                 </h1>
 
                 <div className="flex flex-col gap-8">
-                    {/* Tabs (Swiper) */}
-                    <div className="w-full">
-                        <Swiper
-                            slidesPerView={'auto'}
-                            spaceBetween={12}
-                            freeMode={true}
-                            slidesOffsetAfter={16}
-                            autoplay={{
-                                delay: 5000,
-                                disableOnInteraction: false,
-                                pauseOnMouseEnter: true
-                            }}
-                            modules={[FreeMode, Autoplay]}
-                            className="w-full !pb-4 !px-1"
-                        >
-                            {categories.map((cat) => (
-                                <SwiperSlide key={cat.id} className="!w-auto">
+                    <div className="w-full rounded-2xl border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
+                        <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-8">
+                            {categories.map((cat, index) => (
+                                <div key={cat.id} className={getCategoryLayoutClass(index, categories.length)}>
                                     <button
                                         onClick={() => handleTabChange(cat)}
-                                        className={`px-6 py-3 rounded-full flex items-center gap-2 transition-all duration-300 font-bold border text-sm sm:text-base whitespace-nowrap
-                      ${activeTab === cat.id
-                                                ? 'bg-[#103e6a] text-white border-[#103e6a] shadow-lg scale-105'
-                                                : 'bg-white text-gray-600 border-gray-200 hover:border-[#12985a] hover:text-[#12985a]'
-                                            }`}
+                                        className={`flex min-h-11 w-full items-center justify-center gap-2 rounded-full border px-3 py-2.5 text-center text-xs font-bold transition-all duration-200 sm:min-h-12 sm:px-4 sm:text-sm ${activeTab === cat.id
+                                            ? 'border-[#103e6a]/25 bg-[#103e6a]/8 text-[#103e6a] shadow-sm'
+                                            : 'border-gray-200 bg-white text-gray-600 hover:border-[#12985a]/50 hover:text-[#12985a]'}`}
                                     >
-                                        <span className="text-xl">{cat.icon}</span>
-                                        <span>{cat.title}</span>
+                                        <span className="text-base leading-none sm:text-lg">{cat.icon}</span>
+                                        <span className="line-clamp-1">{cat.title}</span>
                                     </button>
-                                </SwiperSlide>
+                                </div>
                             ))}
-                        </Swiper>
+                        </div>
                     </div>
 
                     {/* Content Area */}
@@ -243,19 +299,11 @@ export default function Donations() {
 }
 
 function DonationCard({ item }) {
-    // States
-    const [selectedCountry, setSelectedCountry] = useState(
-        item.available_countries && item.available_countries.length > 0 ? item.available_countries[0] : null
-    );
+    const defaultSelections = getDefaultSelections(item);
 
-    // Varyantı varsayılan olarak seç, fiyata göre sıralı (küçükten büyüğe)
-    const [selectedType, setSelectedType] = useState(() => {
-        if (item.donation_types && item.donation_types.length > 0) {
-            const sorted = [...item.donation_types].sort((a, b) => (a.price || 0) - (b.price || 0));
-            return sorted[0];
-        }
-        return null;
-    });
+    // States
+    const [selectedCountry, setSelectedCountry] = useState(defaultSelections.defaultCountry);
+    const [selectedType, setSelectedType] = useState(defaultSelections.defaultType);
 
     const [amount, setAmount] = useState('');
     const [quantity, setQuantity] = useState(1);
@@ -272,34 +320,11 @@ function DonationCard({ item }) {
     // Logic Calculation with Price Variants Lookup
     let currentPrice = 0;
 
+    const activeVariant = resolveMatchingVariant(item, selectedCountry, selectedType);
+
     if (hasVariants && selectedType) {
-        // 1. Önce tam eşleşme (Ülke + Tip) ara
-        let variant = null;
-        if (selectedCountry) {
-            variant = item.price_variants.find(v =>
-                v.donation_type_id === selectedType.id &&
-                v.country === selectedCountry
-            );
-        }
-
-        // 2. Sadece Tip eşleşmesi (ülkeden bağımsız)
-        if (!variant) {
-            variant = item.price_variants.find(v =>
-                v.donation_type_id === selectedType.id &&
-                !v.country
-            );
-        }
-
-        // 3. Sadece Ülke eşleşmesi (tipten bağımsız)
-        if (!variant && selectedCountry) {
-            variant = item.price_variants.find(v =>
-                v.country === selectedCountry &&
-                !v.donation_type_id
-            );
-        }
-
-        if (variant) {
-            currentPrice = parseFloat(variant.price);
+        if (activeVariant) {
+            currentPrice = parseFloat(activeVariant.price);
         } else {
             // Hiçbiri yoksa DonationType'ın kendi fiyatı
             currentPrice = parseFloat(selectedType.price || 0);
@@ -311,27 +336,15 @@ function DonationCard({ item }) {
         }
 
     } else if (isFixed) {
-        // Fixed Price: ülkeye özgü varyant ara
-        // donation_type_id null olanı tercih et; bulunamazsa herhangi bir ülke varyantını kullan
-        let variant = null;
-        if (selectedCountry) {
-            const countryVariants = item.price_variants.filter(v => v.country === selectedCountry);
-            variant = countryVariants.find(v => !v.donation_type_id) ?? countryVariants[0] ?? null;
-        }
-        // Ülke eşleşmesi yoksa genel (ülkesiz) varyanta bak
-        if (!variant) {
-            const genericVariants = item.price_variants.filter(v => !v.country);
-            variant = genericVariants.find(v => !v.donation_type_id) ?? genericVariants[0] ?? null;
-        }
-        currentPrice = variant ? parseFloat(variant.price) : parseFloat(item.price || 0);
+        currentPrice = activeVariant ? parseFloat(activeVariant.price) : parseFloat(item.price || 0);
     } else {
         // Flexible
         currentPrice = amount ? parseFloat(amount) : 0;
     }
 
-    const donationType = selectedType
-        ? selectedType.name
-        : (item.is_fixed ? 'Genel Bağış' : `${item.category_name} ${item.name}`);
+    const donationType = selectedType?.name
+        || activeVariant?.donation_type
+        || (item.is_fixed ? 'Genel Bağış' : `${item.category_name} ${item.name}`);
 
     const buildCartItem = (price, shareCount, participants, finalSelectedCountry) => {
         const submissionData = {
@@ -390,7 +403,7 @@ function DonationCard({ item }) {
         }
 
         // Eğer selectedCountry null ise ve available_countries varsa, ilkini seç (fallback)
-        let finalSelectedCountry = selectedCountry;
+        let finalSelectedCountry = selectedCountry || activeVariant?.country || null;
         if (!finalSelectedCountry && item.available_countries && item.available_countries.length > 0) {
             finalSelectedCountry = item.available_countries[0];
         }
@@ -399,7 +412,7 @@ function DonationCard({ item }) {
     };
 
     const handleKurbanConfirm = ({ requested_shares, amount: totalAmount, participants }) => {
-        let finalSelectedCountry = selectedCountry;
+        let finalSelectedCountry = selectedCountry || activeVariant?.country || null;
         if (!finalSelectedCountry && item.available_countries && item.available_countries.length > 0) {
             finalSelectedCountry = item.available_countries[0];
         }
