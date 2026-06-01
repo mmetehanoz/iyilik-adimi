@@ -1,27 +1,27 @@
 import { Link } from 'react-router-dom';
 import QuickDonation from './QuickDonation';
 import DonationCategoryShowcase from './DonationCategoryShowcase';
-// import slider2 from '../assets/slider/s1.webp';
-// import slider3 from '../assets/slider/s2.webp';
-// import slider4 from '../assets/slider/s3.webp';
-// import slider5 from '../assets/slider/s4.webp';
-// import slider6 from '../assets/slider/s5.webp';
-// import slider7 from '../assets/slider/s6.webp';
-// import slider8 from '../assets/slider/s69.webp';
-import slider9 from '../assets/slider/kurban-bayrami-iyilikadimi4.webp';
+import slider2 from '../assets/slider/s1.webp';
+import slider3 from '../assets/slider/s2.webp';
+import slider4 from '../assets/slider/s3.webp';
+import slider5 from '../assets/slider/s4.webp';
+import slider6 from '../assets/slider/s5.webp';
+import slider7 from '../assets/slider/s6.webp';
+import slider8 from '../assets/slider/s69.webp';
+// import slider9 from '../assets/slider/kurban-bayrami-iyilikadimi4.webp';
 
 const slides = [
-    {
-        id: 1,
-        image: slider9,
-    },
-    // { id: 2, image: slider2, title: 'Umut Ol!', subtitle: 'BİR ÇOCUĞUN GÜLÜMSEMESİ DÜNYAYA BEDEL' },
-    // { id: 3, image: slider3, title: 'Paylaşmak Güzeldir', subtitle: 'İHTİYAÇ SAHİPLERİNE EL UZAT' },
-    // { id: 4, image: slider4, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
-    // { id: 5, image: slider5, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
-    // { id: 6, image: slider6, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
-    // { id: 7, image: slider7, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
-    // { id: 8, image: slider8, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
+    // {
+    //     id: 1,
+    //     image: slider9,
+    // },
+    { id: 1, image: slider2, title: 'Umut Ol!', subtitle: 'BİR ÇOCUĞUN GÜLÜMSEMESİ DÜNYAYA BEDEL' },
+    { id: 2, image: slider3, title: 'Paylaşmak Güzeldir', subtitle: 'İHTİYAÇ SAHİPLERİNE EL UZAT' },
+    { id: 3, image: slider4, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
+    { id: 4, image: slider5, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
+    { id: 5, image: slider6, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
+    { id: 6, image: slider7, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
+    { id: 7, image: slider8, title: 'Geleceğe Dokun', subtitle: 'EĞİTİME DESTEK, GELECEĞE IŞIK' },
 ];
 
 export default function Hero() {
