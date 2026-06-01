@@ -52,7 +52,7 @@ export default function Hero() {
                                 to="/bagislar?kategori=Kurban%20Bayramı"
                                 className="hero-cta animate-heartbeat inline-flex items-center justify-center rounded-full bg-[#12985a] px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white shadow-lg transition hover:bg-[#0f7c49] sm:px-6 sm:text-xs lg:px-7 lg:py-3 lg:text-sm"
                             >
-                                Kurban Bağışı Yap
+                                Bağış Yap
                             </Link>
                         </div>
                     </div>
